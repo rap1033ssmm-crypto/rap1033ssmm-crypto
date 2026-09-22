@@ -369,15 +369,172 @@
         "The trio began to frantically plead. The security detail stepped forward to escort them out, but Dondré stood up, raising his hand calmly.",
         "\"Hold on,\" Dondré said, looking over at the guard. \"Tell Mr. HighTower that his new primary equity partners refuse to leave their original crew out in the cold. We handle our business as a unit.\"",
         "The guard went silent, whispered into his earpiece, listened carefully for ten seconds, and then stepped back. \"Mr. HighTower agrees. He states that as his brand new corporate partners, the final verdict is completely on you. You hold the controlling shares. It's your move.\"",
-"Dondré and Marcus slowly turned around, adjusting their jackets, looking directly at Ty, Bennie, and Spoon, who were standing there completely silent for the first time in 48 hours, trembling in their designer sneakers, waiting to see if they were about to be saved or permanently evicted.","Dondré looked at Marcus, Marcus slowly cracked a small, brilliant smile, turned back to the crew, and whispered: "To be continued..."","[THE LESSON OF THE LEDGER]: Most celebrations in life will cost you, or come dangerously close to costing you, the actual opportunity of a lifetime. True happiness and generational wealth aren't found in the applause of the crowd—they are secured in the empty rooms where the real work is recognized."];let currentIdx = 0;let isPlaying = false;let voiceModeEnabled = false;let paceWPM = 174;let textSpeedUnits = 30;let synth = window.speechSynthesis;let voiceArray = [];let activeUtterance = null;let stepTimer = null;const masterPlayPauseBtn = document.getElementById('masterPlayPauseBtn');const activeVoiceLabel = document.getElementById('activeVoiceLabel');const linePrev = document.getElementById('linePrev');const lineCurrent = document.getElementById('lineCurrent');const lineNext = document.getElementById('lineNext');const progressVal = document.getElementById('progressVal');const remainingVal = document.getElementById('remainingVal');const paceVal = document.getElementById('paceVal');const narratorStatusPill = document.getElementById('narratorStatusPill');const voiceOffBtn = document.getElementById('voiceOffBtn');const voiceActiveBtn = document.getElementById('voiceActiveBtn');const systemVoiceSelector = document.getElementById('systemVoiceSelector');const speedUnitsLabel = document.getElementById('speedUnitsLabel');const sliderTrack = document.getElementById('sliderTrack');const sliderFill = document.getElementById('sliderFill');const sliderThumb = document.getElementById('sliderThumb');const scaleStandardBtn = document.getElementById('scaleStandardBtn');const scaleLargeBtn = document.getElementById('scaleLargeBtn');const livePulse = document.getElementById('livePulse');function populateVocalMatrix() {if (!synth) return;voiceArray = synth.getVoices();systemVoiceSelector.innerHTML = '';voiceArray.forEach((voice) => {const option = document.createElement('option');option.textContent = ${voice.name} (${voice.lang});option.setAttribute('data-name', voice.name);systemVoiceSelector.appendChild(option);});if(voiceArray.length > 0) {activeVoiceLabel.innerText = "Voice: Nexus Prime (Holographic Ambient)";}}if (synth && synth.onvoiceschanged !== undefined) {synth.onvoiceschanged = populateVocalMatrix;}populateVocalMatrix();function updateDisplayMetrics() {linePrev.innerText = currentIdx > 0 ? storyScriptLines[currentIdx - 1] : "---";lineCurrent.innerText = storyScriptLines[currentIdx];lineNext.innerText = currentIdx < storyScriptLines.length - 1 ? storyScriptLines[currentIdx + 1] : "---";const progressPercentage = Math.round(((currentIdx + 1) / storyScriptLines.length) * 100);const linesLeft = storyScriptLines.length - (currentIdx + 1);progressVal.innerText = ${progressPercentage}%;remainingVal.innerText = ${linesLeft} lines;paceVal.innerText = ${paceWPM} WPM;}function executeNextPipelineStep() {if (!isPlaying) return;updateDisplayMetrics();if (voiceModeEnabled && synth) {synth.cancel();activeUtterance = new SpeechSynthesisUtterance(storyScriptLines[currentIdx]);const selectedName = systemVoiceSelector.selectedOptions?.getAttribute('data-name');const targetVoice = voiceArray.find(v => v.name === selectedName);if (targetVoice) activeUtterance.voice = targetVoice;activeUtterance.rate = textSpeedUnits / 30;activeUtterance.onend = () => {advancePositionIndex();};activeUtterance.onerror = () => {setTimeout(advancePositionIndex, 2000);};synth.speak(activeUtterance);} else {const wordsInLine = storyScriptLines[currentIdx].split(' ').length;const scrollIntervalDelay = Math.max(2500, (wordsInLine * 60000) / paceWPM);stepTimer = setTimeout(() => {advancePositionIndex();}, scrollIntervalDelay);}}function advancePositionIndex() {if (currentIdx < storyScriptLines.length - 1) {currentIdx++;executeNextPipelineStep();} else {currentIdx = 0;toggleExecutionState(false);updateDisplayMetrics();lineCurrent.innerText = "Stream Cycle Completed. Click to restart.";}}function toggleExecutionState(forceState) {isPlaying = forceState !== undefined ? forceState : !isPlaying;if (isPlaying) {masterPlayPauseBtn.innerText = "❚❚";livePulse.style.backgroundColor = "#26b226";livePulse.style.boxShadow = "0 0 10px #26b226";executeNextPipelineStep();} else {masterPlayPauseBtn.innerText = "▶";livePulse.style.backgroundColor = "#3b82f6";livePulse.style.boxShadow = "0 0 10px #3b82f6";if (synth) synth.pause();clearTimeout(stepTimer);}}masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());voiceActiveBtn.addEventListener('click', () => {voiceModeEnabled = true;voiceActiveBtn.classList.add('selected-active');voiceOffBtn.classList.remove('selected-active');narratorStatusPill.innerText = "Active";narratorStatusPill.style.color = "#26b226";const selectedVoiceName = systemVoiceSelector.selectedOptions?.innerText.split(' (');if (selectedVoiceName) {activeVoiceLabel.innerText = Voice: ${selectedVoiceName};}if (isPlaying) {clearTimeout(stepTimer);executeNextPipelineStep();}});voiceOffBtn.addEventListener('click', () => {voiceModeEnabled = false;voiceOffBtn.classList.add('selected-active');voiceActiveBtn.classList.remove('selected-active');narratorStatusPill.innerText = "Muted";narratorStatusPill.style.color = "var(--accent-blue)";if (synth) synth.cancel();if (isPlaying) {executeNextPipelineStep();}});systemVoiceSelector.addEventListener('change', () => {const fullVoiceName = systemVoiceSelector.selectedOptions?.innerText.split(' (');if (fullVoiceName) activeVoiceLabel.innerText = Voice: ${fullVoiceName};if (isPlaying && voiceModeEnabled) {executeNextPipelineStep();}});scaleLargeBtn.addEventListener('click', () => {scaleLargeBtn.classList.add('selected-active');scaleStandardBtn.classList.remove('selected-active');lineCurrent.style.fontSize = "22px";linePrev.style.fontSize = "17px";lineNext.style.fontSize = "17px";});scaleStandardBtn.addEventListener('click', () => {scaleStandardBtn.classList.add('selected-active');scaleLargeBtn.classList.remove('selected-active');lineCurrent.style.fontSize = "18px";linePrev.style.fontSize = "15px";lineNext.style.fontSize = "15px";});sliderTrack.addEventListener('click', (e) => {const boundingBox = sliderTrack.getBoundingClientRect();const mouseXPosition = e.clientX - boundingBox.left;let percentageTrack = Math.min(100, Math.max(0, (mouseXPosition / boundingBox.width) * 100));sliderThumb.style.left = ${percentageTrack}%;sliderFill.style.width = ${percentageTrack}%;textSpeedUnits = Math.round((percentageTrack / 100) * 85) + 5;speedUnitsLabel.innerText = ${textSpeedUnits} units;paceWPM = Math.round(120 + (textSpeedUnits * 1.8));paceVal.innerText = ${paceWPM} WPM;if (isPlaying) {clearTimeout(stepTimer);executeNextPipelineStep();}});updateDisplayMetrics();        paceVal.innerText = `${paceWPM} WPM`;
+              "Dondré looked at Marcus, Marcus slowly cracked a small, brilliant smile, turned back to the crew, and whispered: \"To be continued...\"",
+           "[THE LESSON OF THE LEDGER]: Most celebrations in life will cost you, or come dangerously close to costing you, the actual opportunity of a lifetime. True happiness and generational wealth aren't found in the applause of the crowd—they are secured in the empty rooms where the real work is recognized."
+    ];
+    let currentIdx = 0;
+    let isPlaying = false;
+    let voiceModeEnabled = false;
+    let paceWPM = 174;
+    let textSpeedUnits = 30; 
+    
+    let synth = window.speechSynthesis;
+    let voiceArray = [];
+    let activeUtterance = null;
+    let stepTimer = null;
 
-        if (isPlaying) {
-            clearTimeout(stepTimer);
-            executeNextPipelineStep();
+    const masterPlayPauseBtn = document.getElementById('masterPlayPauseBtn');
+    const activeVoiceLabel = document.getElementById('activeVoiceLabel');
+    const linePrev = document.getElementById('linePrev');
+    const lineCurrent = document.getElementById('lineCurrent');
+    const lineNext = document.getElementById('lineNext');
+    const progressVal = document.getElementById('progressVal');
+    const remainingVal = document.getElementById('remainingVal');
+    const paceVal = document.getElementById('paceVal');
+    const narratorStatusPill = document.getElementById('narratorStatusPill');
+    const voiceOffBtn = document.getElementById('voiceOffBtn');
+    const voiceActiveBtn = document.getElementById('voiceActiveBtn');
+    const systemVoiceSelector = document.getElementById('systemVoiceSelector');
+    const speedUnitsLabel = document.getElementById('speedUnitsLabel');
+    const sliderTrack = document.getElementById('sliderTrack');
+    const sliderFill = document.getElementById('sliderFill');
+    const sliderThumb = document.getElementById('sliderThumb');
+    const scaleStandardBtn = document.getElementById('scaleStandardBtn');
+    const scaleLargeBtn = document.getElementById('scaleLargeBtn');
+    const livePulse = document.getElementById('livePulse');
+
+    function populateVocalMatrix() {
+        if (!synth) return;
+        voiceArray = synth.getVoices();
+        systemVoiceSelector.innerHTML = '';
+        
+        voiceArray.forEach((voice) => {
+            const option = document.createElement('option');
+            option.textContent = `${voice.name} (${voice.lang})`;
+            option.setAttribute('data-name', voice.name);
+            systemVoiceSelector.appendChild(option);
+        });
+
+        if(voiceArray.length > 0) {
+            activeVoiceLabel.innerText = "Voice: Nexus Prime (Holographic Ambient)";
         }
+    }
+
+    if (synth && synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = populateVocalMatrix;
+    }
+    populateVocalMatrix();
+    function updateDisplayMetrics() {
+        linePrev.innerText = currentIdx > 0 ? storyScriptLines[currentIdx - 1] : "---";
+        lineCurrent.innerText = storyScriptLines[currentIdx];
+        lineNext.innerText = currentIdx < storyScriptLines.length - 1 ? storyScriptLines[currentIdx + 1] : "---";
+
+        const progressPercentage = Math.round(((currentIdx + 1) / storyScriptLines.length) * 100);
+        const linesLeft = storyScriptLines.length - (currentIdx + 1);
+
+        progressVal.innerText = `${progressPercentage}%`;
+        remainingVal.innerText = `${linesLeft} lines`;
+        paceVal.innerText = `${paceWPM} WPM`;
+    }
+
+    function executeNextPipelineStep() {
+        if (!isPlaying) return;
+        updateDisplayMetrics();
+
+        if (voiceModeEnabled && synth) {
+            synth.cancel(); 
+            activeUtterance = new SpeechSynthesisUtterance(storyScriptLines[currentIdx]);
+            const selectedName = systemVoiceSelector.selectedOptions?.getAttribute('data-name');
+            const targetVoice = voiceArray.find(v => v.name === selectedName);
+            if (targetVoice) activeUtterance.voice = targetVoice;
+            activeUtterance.rate = textSpeedUnits / 30; 
+
+            activeUtterance.onend = () => { advancePositionIndex(); };
+            activeUtterance.onerror = () => { setTimeout(advancePositionIndex, 2000); };
+            synth.speak(activeUtterance);
+        } else {
+            const wordsInLine = storyScriptLines[currentIdx].split(' ').length;
+            const scrollIntervalDelay = Math.max(2500, (wordsInLine * 60000) / paceWPM);
+            stepTimer = setTimeout(() => { advancePositionIndex(); }, scrollIntervalDelay);
+        }
+    }
+
+    function advancePositionIndex() {
+        if (currentIdx < storyScriptLines.length - 1) {
+            currentIdx++;
+            executeNextPipelineStep();
+        } else {
+            currentIdx = 0;
+            toggleExecutionState(false);
+            updateDisplayMetrics();
+            lineCurrent.innerText = "Stream Cycle Completed. Click to restart.";
+        }
+    }
+
+    function toggleExecutionState(forceState) {
+        isPlaying = forceState !== undefined ? forceState : !isPlaying;
+        if (isPlaying) {
+            masterPlayPauseBtn.innerText = "❚❚";
+            livePulse.style.backgroundColor = "#26b226"; 
+            livePulse.style.boxShadow = "0 0 10px #26b226";
+            executeNextPipelineStep();
+        } else {
+            masterPlayPauseBtn.innerText = "▶";
+            livePulse.style.backgroundColor = "#3b82f6"; 
+            livePulse.style.boxShadow = "0 0 10px #3b82f6";
+            if (synth) synth.pause();
+            clearTimeout(stepTimer);
+        }
+    }
+
+    masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());
+
+    voiceActiveBtn.addEventListener('click', () => {
+        voiceModeEnabled = true;
+        voiceActiveBtn.classList.add('selected-active');
+        voiceOffBtn.classList.remove('selected-active');
+        narratorStatusPill.innerText = "Active";
+        narratorStatusPill.style.color = "#26b226";
+        if (isPlaying) { clearTimeout(stepTimer); executeNextPipelineStep(); }
+    });
+
+    voiceOffBtn.addEventListener('click', () => {
+        voiceModeEnabled = false;
+        voiceOffBtn.classList.add('selected-active');
+        voiceActiveBtn.classList.remove('selected-active');
+        narratorStatusPill.innerText = "Muted";
+        narratorStatusPill.style.color = "var(--accent-blue)";
+        if (synth) synth.cancel();
+        if (isPlaying) { executeNextPipelineStep(); }
+    });
+
+    sliderTrack.addEventListener('click', (e) => {
+        const boundingBox = sliderTrack.getBoundingClientRect();
+        const mouseXPosition = e.clientX - boundingBox.left;
+        let percentageTrack = Math.min(100, Math.max(0, (mouseXPosition / boundingBox.width) * 100));
+        sliderThumb.style.left = `${percentageTrack}%`;
+        sliderFill.style.width = `${percentageTrack}%`;
+        textSpeedUnits = Math.round((percentageTrack / 100) * 85) + 5; 
+        speedUnitsLabel.innerText = `${textSpeedUnits} units`;
+        paceWPM = Math.round(120 + (textSpeedUnits * 1.8));
+        paceVal.innerText = `${paceWPM} WPM`;
+        if (isPlaying) { clearTimeout(stepTimer); executeNextPipelineStep(); }
+    });
+
+    scaleLargeBtn.addEventListener('click', () => {
+        scaleLargeBtn.classList.add('selected-active');
+        scaleStandardBtn.classList.remove('selected-active');
+        lineCurrent.style.fontSize = "22px";
+    });
+
+    scaleStandardBtn.addEventListener('click', () => {
+        scaleStandardBtn.classList.add('selected-active');
+        scaleLargeBtn.classList.remove('selected-active');
+        lineCurrent.style.fontSize = "18px";
     });
 
     updateDisplayMetrics();
+
 </script>
 </body>
 </html>
