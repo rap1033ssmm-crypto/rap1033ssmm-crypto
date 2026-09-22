@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice: Nexus Prime (Holographic Ambient)</title>
+    <style>
+        :root {
+            --bg-color: #0d0f14;
+            --surface-color: #14161e;
+            --border-color: #232530;
+            --accent-blue: #2563eb;
+            --text-main: #ffffff;
+            --text-muted: #4b526d;
+            --text-stats: #707793;
+            --gold: #d4af37;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .player-console {
+            background-color: var(--surface-color);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        /* Top Voice Mode Bar */
+        .voice-mode-indicator {
+            background-color: #1a1c23;
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border: 1px solid #282a36;
+        }
+
+        .voice-status-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #3b82f6;
+            animation: beacon 2s infinite ease-in-out;
+        }
+
+        @keyframes beacon {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        .voice-title-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            color: #f1f2f6;
+            text-transform: uppercase;
+        }
+
+        .action-icon-circle {
+            width: 32px;
+            height: 32px;
+            background-color: #282a36;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            cursor: pointer;
+            color: #ffffff;
+            border: none;
+        }
+
+        /* Real-Time Scrolling Text Windows */
+        .text-display-gate {
+            height: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 24px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .display-line {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 6px 0;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .display-line.active-focus {
+            font-size: 18px;
+            color: var(--text-main);
+            font-weight: 600;
+            opacity: 1;
+            padding: 6px 0;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            white-space: normal;
+            overflow: visible;
+        }
+
+        /* Metric Stats Row Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            text-align: center;
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .metric-card {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .metric-card:last-child {
+            border-right: none;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--text-stats);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Control Toggles Blocks */
+        .control-group {
+            margin-bottom: 24px;
+        }
+
+        .control-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .section-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f1f2f6;
+        }
+
+        .status-pill-text {
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .toggle-switch-dock {
+            background-color: var(--bg-color);
+            border-radius: 14px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            background-color: transparent;
+            color: var(--text-stats);
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.selected-active {
+            background-color: var(--accent-blue);
+            color: var(--text-main);
+        }
+
+        /* Range Slider Styling */
+        .range-slider-track {
+            position: relative;
+            padding: 12px 0;
+            cursor: pointer;
+        }
+
+        .slider-bar-back {
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            width: 100%;
+        }
+
+        .slider-bar-fill {
+            height: 4px;
+            background-color: var(--accent-blue);
+            border-radius: 2px;
+            position: absolute;
+            top: 12px;
+            left: 0;
+        }
+
+        .slider-handle-thumb {
+            width: 16px;
+            height: 16px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            position: absolute;
+            top: 6px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 8px rgba(0,0,0,0.6);
+            transform: translateX(-50%);
+            transition: transform 0.1s;
+        }
+        
+        .voice-selector-box {
+            background: #111;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 6px;
+            width: 100%;
+            font-family: inherit;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="player-console">
+    <!-- Top Voice State Badge Row -->
+    <div class="voice-mode-indicator">
+        <div class="voice-status-group">
+            <div class="pulse-dot" id="livePulse"></div>
+            <div class="voice-title-label" id="activeVoiceLabel">Voice: Loading Engine...</div>
+        </div>
+        <button class="action-icon-circle" id="masterPlayPauseBtn">▶</button>
+    </div>
+
+    <!-- Center Line Focus Window -->
+    <div class="text-display-gate">
+        <div class="display-line" id="linePrev">---</div>
+        <div class="display-line active-focus" id="lineCurrent">Click Start to Stream Network Data</div>
+        <div class="display-line" id="lineNext">---</div>
+    </div>
+
+    <!-- Progress Grid Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Read Progress</div>
+            <div class="metric-value" id="progressVal">0%</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Remaining</div>
+            <div class="metric-value" id="remainingVal">0 lines</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Pace Factor</div>
+            <div class="metric-value" id="paceVal">174 WPM</div>
+        </div>
+    </div>
+
+    <!-- AI Voice Narrator Control Button Toggles -->
+    <div class="control-group">
+        <div class="control-header-row">
+            <span class="section-label">AI voice narrator</span>
+            <span class="status-pill-text" id="narratorStatusPill">Muted</span>
+        </div>
+        <div class="toggle-switch-dock">
+            <button class="toggle-btn selected-active" id="voiceOffBtn">Voice off</button>
+            <button class="toggle-btn" id="voiceActiveBtn">🔊 Voice active</button>
+        </div>
+        <select class="voice-selector-box" id="systemVoiceSelector">
+                      <option>Loading system vocal matrix...</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <div class="control-header-row">
+            <span class="section-label">Scrolling & voice speed</span>
+            <span class="metric-value" style="font-size: 13px;" id="speedUnitsLabel">30 units</span>
+        </div>
+        <div class="range-slider-track" id="sliderTrack">
+            <div class="slider-bar-back"></div>
+            <div class="slider-bar-fill" id="sliderFill" style="width: 35%;"></div>
+            <div class="slider-handle-thumb" id="sliderThumb" style="left: 35%;"></div>
+        </div>
+    </div>
+
+    <div class="control-group" style="margin-bottom: 0;">
+        <div class="control-header-row">
+            <span class="section-label">Typography scale</span>
+        </div>
+        <div class="toggle-switch-dock">
+            <button class="toggle-btn selected-active" id="scaleStandardBtn">Standard</button>
+            <button class="toggle-btn" id="scaleLargeBtn">Large font</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Full content sequence matrix
+    const storyScriptLines = [
+        "[THE EXECUTIVE EXECUTION MEMO]: The loudest person in the room is usually broadcasting their own eviction notice. While the amateurs are busy celebrating a victory lap before the starting gun even fires, the silent operators are in the shadows quietly buying up the stadium. Focus on the final ledger, not the flare.",
+        "THE BAG, THE BAIT, AND THE EMPTY LUXURY STEAKHOUSE — A Famo Nation Master Narrative.",
+        "The advance check hadn't even cleared the digital ledger yet, but Fly-Guy Ty, Big-Talk Bennie, and Shine-Time Spoon were already acting like they owned the federal reserve. The crew had rolled out of town into the sprawling concrete belly of Atlanta, ostensibly to finalize a massive, life-altering multi-million dollar advertisement deal for the Famo Nation Organization.",
+        "But the moment the tires hit the city, the hype-brigade mutated into a traveling circus of premature flamboyance.",
+        "\"Man, we ain't just getting the bag, we getting the whole leather luggage set!\" Ty screamed to a group of unimpressed influencers at a rooftop lounge, flashing a rented jewelry piece that was vibrating with aggressive low-tier energy.",
+        "Bennie was buying premium rounds of appetizers for the entire bar, shouting his business plans into every ear that would listen, while Spoon was busy bragging about the upcoming corporate board meeting to a group of women who were clearly just calculating how many free premium lobster tails they could extract from his temporary enthusiasm.",
+        "Meanwhile, on the completely opposite side of the metropolis, away from the neon lights and the deafening base-boosted trap music, Dondré \"The Blueprint\" and Marcus \"Mute-Button\" were trying to navigate the hushed, intimidating silence of 'L’Élite Absolute'—a high-end luxury restaurant so exclusive that the menu didn't even bother listing prices.",
+        "It was just assumed that if you had to ask, you’d probably have to wash dishes until the year 2030. The place was beautifully, eerily empty, draped in deep velvet and mahogany, smelling faintly of old oil money and unreleased corporate secrets.",
+        "\"I’m telling you, Marcus,\" Dondré whispered, sweating slightly in a heavy starched collar while staring down a pristine, microscopic portion of wagyu beef. \"We got these two free promotional meal tickets anonymously dropped under our hotel door, so we are going to eat this elite food, leave a generous tip, and bounce. No extra talking, no lingering. We got the real presentation tomorrow at 9:00 AM sharp, and I refuse to look like a zombie because we got caught up in the high-class aesthetic flare.\"",
+        "Marcus simply nodded, executing his signature deadpan silence. He was busy trying to decipher whether his appetizer was an edible flower or just highly decorative lettuce.",
+        "But their disciplined silence was shattered when a towering, immaculate figure in a tailored all-black silk suit gestured from the far corner of the room. He was sitting at a massive, isolated table lined with actual 24-karat gold trim. Flanking him were three highly skilled, tried-and-tested personal bodyguards who stood so perfectly still they looked like expensive marble statues.",
+        "\"Hey, you two. Yeah, the ones sweating over the tiny steak. Bring your plates over here,\" a deep, commanding voice echoed across the empty dining floor. It was Mr. HighTower.",
+        "Dondré and Marcus carefully walked over, their survival instincts instantly kicking into overdrive. HighTower looked them up and down, letting out a sharp, resonant laugh.",
+        "\"Sit down,\" HighTower chuckled, waving his hand. \"I’ve been sitting here for twenty minutes overhearing your conversation. You two are hilarious. You're sitting in a restaurant where a single glass of water costs more than your shoes, talking about staying disciplined, respecting the free tickets, and bouncing early to stay prepared for your big corporate presentation tomorrow.\"",
+        "\"Just trying to stay focused on the objective, sir,\" Dondré said, adjusting his watch.",
+        "HighTower leaned forward, the gold trim on the table catching the light, a wide, knowing grin breaking across his face. \"Well, let me let you in on a little secret that's going to blow your minds. I own the mega-conglomerate that is issuing that advertisement contract tomorrow. I am the one who personally arranged for those 'free promotional meal tickets' to be slipped under your door. I knew exactly who you two were the second your feet crossed my threshold.\"",
+        "Dondré froze with his fork halfway to his mouth. Marcus didn't blink, but his eyebrows shot straight into his hairline.",
+        "\"See, I don't do standard corporate interviews,\" HighTower said, leaning back. \"I like to run a little sociological field test on my potential business partners. I anonymously gave your entire group an upfront, no-strings-attached luxury cash allowance and an elite hotel suite for the weekend just to see where your active focus actually lays before we ever sit down at a mahogany table.\"",
+        "HighTower chuckled, shaking his head. \"And boy, your buddies are putting on an absolute clinic in the club district right now! My venue first-in-command has been calling me every fifteen minutes giving me live audio-visual reports of their wonderful, loud-mouth activities.\"",
+        "\"Your boy Ty is currently outside a VIP lounge telling a bouncer he’s my new vice president, Bennie is trying to tax-write a round of shots on an account that doesn't exist, and Spoon is telling a crowd of women that I'm his uncle! If it were up to me based on them, I’d have to make your whole group disappear from the industry completely—hint, hint, look at my security guys, they don't even know how to smile!\"",
+        "The bodyguards remained perfectly expressionless, adding a terrifyingly funny punchline to the statement.",
+        "\"But you two?\" HighTower smiled warmly, tapping the gold table. \"You two took the bait but ignored the hook. You stayed quiet, you stayed prepared, and you respected the architecture of the goal. So here’s how we're playing this move: The presentation tomorrow is officially canceled because you already won. You aren't just getting the advertisement deal. You two are coming directly to my private top-floor office tomorrow morning at 8:00 AM. We are signing an entirely restructured joint-venture partnership. You are getting direct equity shares, corporate board seats, and every single logistical term negotiated entirely in your favor.\"",
+        "The next morning at 10:30 AM, the high-rise corporate lobby doors burst open. Fly-Guy Ty, Big-Talk Bennie, and Shine-Time Spoon scrambled inside, looking completely disheveled, deeply hungover, and vibrating with sheer panic.",
+        "They spotted Dondré and Marcus sitting comfortably on pristine, million-dollar white Italian leather sofas in the center of the lobby, looking sharp, calm, and holding signed leather executive portfolios.",
+        "\"Oh thank god you guys are here!\" Ty panted, wiping sweat from his forehead. \"Man, we overslept, the alarm didn't go off, we had a wild night networking at the spots—wait, why are y'all looking at us like that? Let's go up and sign this contract!\"",
+        "Before Dondré could speak, the glass double doors of the executive suite opened. HighTower’s lead security guard stepped out, looking down at the trio with absolute zero-tolerance energy.",
+        "\"Mr. HighTower has explicitly stated that the loud-mouthed club patrons from last night are permanently barred from ascending to the executive floor. Security is cleared to remove them from the lobby immediately,\" the guard stated coldly.",
+        "\"Wait, what?!\" Bennie yelled, his voice cracking. \"We are the partners! Dondré, tell him! Marcus, say something!\"",
+        "The trio began to frantically plead. The security detail stepped forward to escort them out, but Dondré stood up, raising his hand calmly.",
+        "\"Hold on,\" Dondré said, looking over at the guard. \"Tell Mr. HighTower that his new primary equity partners refuse to leave their original crew out in the cold. We handle our business as a unit.\"",
+        "The guard went silent, whispered into his earpiece, listened carefully for ten seconds, and then stepped back. \"Mr. HighTower agrees. He states that as his brand new corporate partners, the final verdict is completely on you. You hold the controlling shares. It's your move.\"",
+"Dondré and Marcus slowly turned around, adjusting their jackets, looking directly at Ty, Bennie, and Spoon, who were standing there completely silent for the first time in 48 hours, trembling in their designer sneakers, waiting to see if they were about to be saved or permanently evicted.","Dondré looked at Marcus, Marcus slowly cracked a small, brilliant smile, turned back to the crew, and whispered: "To be continued..."","[THE LESSON OF THE LEDGER]: Most celebrations in life will cost you, or come dangerously close to costing you, the actual opportunity of a lifetime. True happiness and generational wealth aren't found in the applause of the crowd—they are secured in the empty rooms where the real work is recognized."];let currentIdx = 0;let isPlaying = false;let voiceModeEnabled = false;let paceWPM = 174;let textSpeedUnits = 30;let synth = window.speechSynthesis;let voiceArray = [];let activeUtterance = null;let stepTimer = null;const masterPlayPauseBtn = document.getElementById('masterPlayPauseBtn');const activeVoiceLabel = document.getElementById('activeVoiceLabel');const linePrev = document.getElementById('linePrev');const lineCurrent = document.getElementById('lineCurrent');const lineNext = document.getElementById('lineNext');const progressVal = document.getElementById('progressVal');const remainingVal = document.getElementById('remainingVal');const paceVal = document.getElementById('paceVal');const narratorStatusPill = document.getElementById('narratorStatusPill');const voiceOffBtn = document.getElementById('voiceOffBtn');const voiceActiveBtn = document.getElementById('voiceActiveBtn');const systemVoiceSelector = document.getElementById('systemVoiceSelector');const speedUnitsLabel = document.getElementById('speedUnitsLabel');const sliderTrack = document.getElementById('sliderTrack');const sliderFill = document.getElementById('sliderFill');const sliderThumb = document.getElementById('sliderThumb');const scaleStandardBtn = document.getElementById('scaleStandardBtn');const scaleLargeBtn = document.getElementById('scaleLargeBtn');const livePulse = document.getElementById('livePulse');function populateVocalMatrix() {if (!synth) return;voiceArray = synth.getVoices();systemVoiceSelector.innerHTML = '';voiceArray.forEach((voice) => {const option = document.createElement('option');option.textContent = ${voice.name} (${voice.lang});option.setAttribute('data-name', voice.name);systemVoiceSelector.appendChild(option);});if(voiceArray.length > 0) {activeVoiceLabel.innerText = "Voice: Nexus Prime (Holographic Ambient)";}}if (synth && synth.onvoiceschanged !== undefined) {synth.onvoiceschanged = populateVocalMatrix;}populateVocalMatrix();function updateDisplayMetrics() {linePrev.innerText = currentIdx > 0 ? storyScriptLines[currentIdx - 1] : "---";lineCurrent.innerText = storyScriptLines[currentIdx];lineNext.innerText = currentIdx < storyScriptLines.length - 1 ? storyScriptLines[currentIdx + 1] : "---";const progressPercentage = Math.round(((currentIdx + 1) / storyScriptLines.length) * 100);const linesLeft = storyScriptLines.length - (currentIdx + 1);progressVal.innerText = ${progressPercentage}%;remainingVal.innerText = ${linesLeft} lines;paceVal.innerText = ${paceWPM} WPM;}function executeNextPipelineStep() {if (!isPlaying) return;updateDisplayMetrics();if (voiceModeEnabled && synth) {synth.cancel();activeUtterance = new SpeechSynthesisUtterance(storyScriptLines[currentIdx]);const selectedName = systemVoiceSelector.selectedOptions?.getAttribute('data-name');const targetVoice = voiceArray.find(v => v.name === selectedName);if (targetVoice) activeUtterance.voice = targetVoice;activeUtterance.rate = textSpeedUnits / 30;activeUtterance.onend = () => {advancePositionIndex();};activeUtterance.onerror = () => {setTimeout(advancePositionIndex, 2000);};synth.speak(activeUtterance);} else {const wordsInLine = storyScriptLines[currentIdx].split(' ').length;const scrollIntervalDelay = Math.max(2500, (wordsInLine * 60000) / paceWPM);stepTimer = setTimeout(() => {advancePositionIndex();}, scrollIntervalDelay);}}function advancePositionIndex() {if (currentIdx < storyScriptLines.length - 1) {currentIdx++;executeNextPipelineStep();} else {currentIdx = 0;toggleExecutionState(false);updateDisplayMetrics();lineCurrent.innerText = "Stream Cycle Completed. Click to restart.";}}function toggleExecutionState(forceState) {isPlaying = forceState !== undefined ? forceState : !isPlaying;if (isPlaying) {masterPlayPauseBtn.innerText = "❚❚";livePulse.style.backgroundColor = "#26b226";livePulse.style.boxShadow = "0 0 10px #26b226";executeNextPipelineStep();} else {masterPlayPauseBtn.innerText = "▶";livePulse.style.backgroundColor = "#3b82f6";livePulse.style.boxShadow = "0 0 10px #3b82f6";if (synth) synth.pause();clearTimeout(stepTimer);}}masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());voiceActiveBtn.addEventListener('click', () => {voiceModeEnabled = true;voiceActiveBtn.classList.add('selected-active');voiceOffBtn.classList.remove('selected-active');narratorStatusPill.innerText = "Active";narratorStatusPill.style.color = "#26b226";const selectedVoiceName = systemVoiceSelector.selectedOptions?.innerText.split(' (');if (selectedVoiceName) {activeVoiceLabel.innerText = Voice: ${selectedVoiceName};}if (isPlaying) {clearTimeout(stepTimer);executeNextPipelineStep();}});voiceOffBtn.addEventListener('click', () => {voiceModeEnabled = false;voiceOffBtn.classList.add('selected-active');voiceActiveBtn.classList.remove('selected-active');narratorStatusPill.innerText = "Muted";narratorStatusPill.style.color = "var(--accent-blue)";if (synth) synth.cancel();if (isPlaying) {executeNextPipelineStep();}});systemVoiceSelector.addEventListener('change', () => {const fullVoiceName = systemVoiceSelector.selectedOptions?.innerText.split(' (');if (fullVoiceName) activeVoiceLabel.innerText = Voice: ${fullVoiceName};if (isPlaying && voiceModeEnabled) {executeNextPipelineStep();}});scaleLargeBtn.addEventListener('click', () => {scaleLargeBtn.classList.add('selected-active');scaleStandardBtn.classList.remove('selected-active');lineCurrent.style.fontSize = "22px";linePrev.style.fontSize = "17px";lineNext.style.fontSize = "17px";});scaleStandardBtn.addEventListener('click', () => {scaleStandardBtn.classList.add('selected-active');scaleLargeBtn.classList.remove('selected-active');lineCurrent.style.fontSize = "18px";linePrev.style.fontSize = "15px";lineNext.style.fontSize = "15px";});sliderTrack.addEventListener('click', (e) => {const boundingBox = sliderTrack.getBoundingClientRect();const mouseXPosition = e.clientX - boundingBox.left;let percentageTrack = Math.min(100, Math.max(0, (mouseXPosition / boundingBox.width) * 100));sliderThumb.style.left = ${percentageTrack}%;sliderFill.style.width = ${percentageTrack}%;textSpeedUnits = Math.round((percentageTrack / 100) * 85) + 5;speedUnitsLabel.innerText = ${textSpeedUnits} units;paceWPM = Math.round(120 + (textSpeedUnits * 1.8));paceVal.innerText = ${paceWPM} WPM;if (isPlaying) {clearTimeout(stepTimer);executeNextPipelineStep();}});updateDisplayMetrics();        paceVal.innerText = `${paceWPM} WPM`;
+
+        if (isPlaying) {
+            clearTimeout(stepTimer);
+            executeNextPipelineStep();
+        }
+    });
+
+    updateDisplayMetrics();
+</script>
+</body>
+</html>
