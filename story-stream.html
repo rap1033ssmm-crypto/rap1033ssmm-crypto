@@ -437,37 +437,37 @@
         paceVal.innerText = `${paceWPM} WPM`;
     }
 
-    function executeNextPipelineStep() {
+      function executeNextPipelineStep() {
         if (!isPlaying) return;
         updateDisplayMetrics();
 
-        if (voiceModeEnabled && synth) {
-            synth.cancel(); 
-            activeUtterance = new SpeechSynthesisUtterance(storyScriptLines[currentIdx]);
-            const selectedName = systemVoiceSelector.selectedOptions?.getAttribute('data-name');
-            const targetVoice = voiceArray.find(v => v.name === selectedName);
-            if (targetVoice) activeUtterance.voice = targetVoice;
-            activeUtterance.rate = textSpeedUnits / 30; 
+        // Separate execution threads: force text display update immediately
+        linePrev.innerText = currentIdx > 0 ? storyScriptLines[currentIdx - 1] : "---";
+        lineCurrent.innerText = storyScriptLines[currentIdx];
+        lineNext.innerText = currentIdx < storyScriptLines.length - 1 ? storyScriptLines[currentIdx + 1] : "---";
 
-            activeUtterance.onend = () => { advancePositionIndex(); };
-            activeUtterance.onerror = () => { setTimeout(advancePositionIndex, 2000); };
-            synth.speak(activeUtterance);
+        if (voiceModeEnabled && synth) {
+            try {
+                synth.cancel();
+                activeUtterance = new SpeechSynthesisUtterance(storyScriptLines[currentIdx]);
+                const selectedName = systemVoiceSelector.selectedOptions[0]?.getAttribute('data-name');
+                const targetVoice = voiceArray.find(v => v.name === selectedName);
+                if (targetVoice) activeUtterance.voice = targetVoice;
+                activeUtterance.rate = textSpeedUnits / 30;
+
+                activeUtterance.onend = () => { advancePositionIndex(); };
+                activeUtterance.onerror = () => { advancePositionIndex(); };
+                synth.speak(activeUtterance);
+            } catch (e) {
+                // If browser audio block fires, detach audio and continue text scrolling
+                const wordsInLine = storyScriptLines[currentIdx].split(' ').length;
+                const scrollIntervalDelay = Math.max(3000, (wordsInLine * 60000) / paceWPM);
+                stepTimer = setTimeout(advancePositionIndex, scrollIntervalDelay);
+            }
         } else {
             const wordsInLine = storyScriptLines[currentIdx].split(' ').length;
-            const scrollIntervalDelay = Math.max(2500, (wordsInLine * 60000) / paceWPM);
-            stepTimer = setTimeout(() => { advancePositionIndex(); }, scrollIntervalDelay);
-        }
-    }
-
-    function advancePositionIndex() {
-        if (currentIdx < storyScriptLines.length - 1) {
-            currentIdx++;
-            executeNextPipelineStep();
-        } else {
-            currentIdx = 0;
-            toggleExecutionState(false);
-            updateDisplayMetrics();
-            lineCurrent.innerText = "Stream Cycle Completed. Click to restart.";
+            const scrollIntervalDelay = Math.max(3000, (wordsInLine * 60000) / paceWPM);
+            stepTimer = setTimeout(advancePositionIndex, scrollIntervalDelay);
         }
     }
 
@@ -475,17 +475,18 @@
         isPlaying = forceState !== undefined ? forceState : !isPlaying;
         if (isPlaying) {
             masterPlayPauseBtn.innerText = "❚❚";
-            livePulse.style.backgroundColor = "#26b226"; 
+            livePulse.style.backgroundColor = "#26b226";
             livePulse.style.boxShadow = "0 0 10px #26b226";
             executeNextPipelineStep();
         } else {
             masterPlayPauseBtn.innerText = "▶";
-            livePulse.style.backgroundColor = "#3b82f6"; 
+            livePulse.style.backgroundColor = "#3b82f6";
             livePulse.style.boxShadow = "0 0 10px #3b82f6";
-            if (synth) synth.pause();
+            if (synth) synth.cancel();
             clearTimeout(stepTimer);
         }
     }
+
 
     masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());
 
