@@ -10,6 +10,7 @@
             --surface-color: #14161e;
             --border-color: #232530;
             --accent-blue: #2563eb;
+            --accent-green: #26b226;
             --text-main: #ffffff;
             --text-muted: #4b526d;
             --text-stats: #707793;
@@ -57,6 +58,7 @@
             background-color: #3b82f6;
             border-radius: 50%;
             box-shadow: 0 0 10px #3b82f6;
+            transition: all 0.3s ease;
         }
         .voice-title-label {
             font-size: 11px;
@@ -77,6 +79,7 @@
             cursor: pointer;
             color: #ffffff;
             border: none;
+            transition: all 0.2s ease;
         }
         .text-display-gate {
             height: 140px;
@@ -86,13 +89,14 @@
             text-align: center;
             margin-bottom: 24px;
             overflow: hidden;
+            position: relative;
         }
         .display-line {
             font-size: 14px;
             color: var(--text-muted);
             margin: 8px 0;
-            opacity: 0.5;
-            transition: all 0.3s ease;
+            opacity: 0.4;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -104,6 +108,7 @@
             opacity: 1;
             white-space: normal;
             overflow: visible;
+            transform: scale(1.02);
         }
         .metrics-grid {
             display: grid;
@@ -148,6 +153,7 @@
             font-size: 12px;
             color: var(--accent-blue);
             font-weight: 600;
+            transition: color 0.3s ease;
         }
         .toggle-switch-dock {
             background-color: var(--bg-color);
@@ -155,7 +161,7 @@
             padding: 4px;
             display: flex;
             gap: 4px;
-            border: 1px solid rgba(255,255,255,0.02);
+            border: 1px solid rgba(255, 255, 255, 0.02);
         }
         .toggle-btn {
             flex: 1;
@@ -168,15 +174,30 @@
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
+            transition: all 0.2s ease;
         }
         .toggle-btn.selected-active {
             background-color: var(--accent-blue);
             color: var(--text-main);
         }
+        .voice-selector-box {
+            background: #11141a;
+            color: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            font-family: inherit;
+            font-size: 13px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            outline: none;
+        }
         .range-slider-track {
             position: relative;
             padding: 12px 0;
             cursor: pointer;
+            user-select: none;
         }
         .slider-bar-back {
             height: 4px;
@@ -191,6 +212,7 @@
             position: absolute;
             top: 12px;
             left: 0;
+            transition: background-color 0.3s ease;
         }
         .slider-handle-thumb {
             width: 16px;
@@ -200,306 +222,282 @@
             position: absolute;
             top: 6px;
             border: 2px solid #ffffff;
-            box-shadow: 0 0 8px rgba(0,0,0,0.6);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
             transform: translateX(-50%);
-        }
-        .voice-selector-box {
-            background: #111;
-            color: #fff;
-            border: 1px solid var(--border-color);
-            padding: 8px;
-            border-radius: 6px;
-            width: 100%;
-            font-family: inherit;
-            font-size: 12px;
-            margin-top: 5px;
+            transition: background-color 0.3s ease;
         }
     </style>
 </head>
 <body>
-<div class="player-console">
-    <div class="voice-mode-indicator">
-        <div class="voice-status-group">
-            <div class="pulse-dot" id="livePulse"></div>
-            <div class="voice-title-label" id="activeVoiceLabel">Voice: Nexus Prime</div>
+    <div class="player-console">
+        <div class="voice-mode-indicator">
+            <div class="voice-status-group">
+                <div class="pulse-dot" id="livePulse"></div>
+                <div class="voice-title-label" id="activeVoiceLabel">Voice: Nexus Prime</div>
+            </div>
+            <button class="action-icon-circle" id="masterPlayPauseBtn">▶</button>
         </div>
-        <button class="action-icon-circle" id="masterPlayPauseBtn">▶</button>
-    </div>
-    <div class="text-display-gate">
-        <div class="display-line" id="linePrev">---</div>
-        <div class="display-line active-focus" id="lineCurrent">Loading system narrative array data...</div>
-        <div class="display-line" id="lineNext">---</div>
-    </div>
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <div class="metric-label">Read Progress</div>
-            <div class="metric-value" id="progressVal">0%</div>
+        <!-- Kinetic Scrolling Node Window Box -->
+        <div class="text-display-gate" id="textViewportGate">
+            <div class="display-line active-focus" id="lineCurrent">[System Standby: Initiating...]</div>
         </div>
-        <div class="metric-card">
-            <div class="metric-label">Remaining</div>
-            <div class="metric-value" id="remainingVal">0 lines</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Pace Factor</div>
-            <div class="metric-value" id="paceVal">174 WPM</div>
-        </div>
-    </div>
-    <div class="control-group">
-        <div class="control-header-row">
-            <span class="section-label">AI voice narrator</span>
-            <span class="status-pill-text" id="narratorStatusPill">Muted</span>
-        </div>
-        <div class="toggle-switch-dock">
-            <button class="toggle-btn selected-active" id="voiceOffBtn">Voice off</button>
-            <button class="toggle-btn" id="voiceActiveBtn">🔊 Voice active</button>
-        </div>
-        <select class="voice-selector-box" id="systemVoiceSelector">
-            <option>Loading system vocal matrix...</option>
-        </select>
-    </div>
-    <div class="control-group">
-        <div class="control-header-row">
-            <span class="section-label">Scrolling & voice speed</span>
-            <span class="metric-value" style="font-size: 13px;" id="speedUnitsLabel">30 units</span>
-        </div>
-        <div class="range-slider-track" id="sliderTrack">
-            <div class="slider-bar-back"></div>
-            <div class="slider-bar-fill" id="sliderFill" style="width: 35%;"></div>
-            <div class="slider-handle-thumb" id="sliderThumb" style="left: 35%;"></div>
-        </div>
-    </div>
-    <div class="control-group" style="margin-bottom: 0;">
-        <div class="control-header-row">
-            <span class="section-label">Typography scale</span>
-        </div>
-        <div class="toggle-switch-dock">
-            <button class="toggle-btn selected-active" id="scaleStandardBtn">Standard</button>
-            <button class="toggle-btn" id="scaleLargeBtn">Large font</button>
-        </div>
-    </div>
-</div>
-</div>
 
-<script>
-    // Full unedited content sequence matrix
-    const storyScriptLines = [
-        "[THE EXECUTIVE EXECUTION MEMO]: The loudest person in the room is usually broadcasting their own eviction notice. While the amateurs are busy celebrating a victory lap before the starting gun even fires, the silent operators are in the shadows quietly buying up the stadium. Focus on the final ledger, not the flare.",
-        "THE BAG, THE BAIT, AND THE EMPTY LUXURY STEAKHOUSE — A Famo Nation Master Narrative.",
-        "The advance check hadn't even cleared the digital ledger yet, but Fly-Guy Ty, Big-Talk Bennie, and Shine-Time Spoon were already acting like they owned the federal reserve. The crew had rolled out of town into the sprawling concrete belly of Atlanta, ostensibly to finalize a massive, life-altering multi-million dollar advertisement deal for the Famo Nation Organization.",
-        "But the moment the tires hit the city, the hype-brigade mutated into a traveling circus of premature flamboyance.",
-        "\"Man, we ain't just getting the bag, we getting the whole leather luggage set!\" Ty screamed to a group of unimpressed influencers at a rooftop lounge, flashing a rented jewelry piece that was vibrating with aggressive low-tier energy.",
-              "Bennie was buying premium rounds of appetizers for the entire bar, shouting his business plans into every ear that would listen, while Spoon was busy bragging about the upcoming corporate board meeting to a group of women who were clearly just calculating how many free premium lobster tails they could extract from his temporary enthusiasm.",
-        "Meanwhile, on the completely opposite side of the metropolis, away from the neon lights and the deafening base-boosted trap music, Dondré \"The Blueprint\" and Marcus \"Mute-Button\" were trying to navigate the hushed, intimidating silence of 'L’Élite Absolute'—a high-end luxury restaurant so exclusive that the menu didn't even bother listing prices.",
-        "It was just assumed that if you had to ask, you’d probably have to wash dishes until the year 2030. The place was beautifully, eerily empty, draped in deep velvet and mahogany, smelling faintly of old oil money and unreleased corporate secrets.",
-        "\"I’m telling you, Marcus,\" Dondré whispered, sweating slightly in a heavy starched collar while staring down a pristine, microscopic portion of wagyu beef. \"We got these two free promotional meal tickets anonymously dropped under our hotel door, so we are going to eat this elite food, leave a generous tip, and bounce. No extra talking, no lingering. We got the real presentation tomorrow at 9:00 AM sharp, and I refuse to look like a zombie because we got caught up in the high-class aesthetic flare.\"",
-        "Marcus simply nodded, executing his signature deadpan silence. He was busy trying to decipher whether his appetizer was an edible flower or just highly decorative lettuce."
-        "But their disciplined silence was shattered when a towering, immaculate figure in a tailored all-black silk suit gestured from the far corner of the room. He was sitting at a massive, isolated table lined with actual 24-karat gold trim. Flanking him were three highly skilled, tried-and-tested personal bodyguards who stood so perfectly still they looked like expensive marble statues.",
-        "\"Hey, you two. Yeah, the ones sweating over the tiny steak. Bring your plates over here,\" a deep, commanding voice echoed across the empty dining floor. It was Mr. HighTower.",
-        "Dondré and Marcus carefully walked over, their survival instincts instantly kicking into overdrive. HighTower looked them up and down, letting out a sharp, resonant laugh.",
-        "\"Sit down,\" HighTower chuckled, waving his hand. \"I’ve been sitting here for twenty minutes overhearing your conversation. You two are hilarious. You're sitting in a restaurant where a single glass of water costs more than your shoes, talking about staying disciplined, respecting the free tickets, and bouncing early to stay prepared for your big corporate presentation tomorrow.\"",
-        "\"Just trying to stay focused on the objective, sir,\" Dondré said, adjusting his watch."
-        "HighTower leaned forward, the gold trim on the table catching the light, a wide, knowing grin breaking across his face. \"Well, let me let you in on a little secret that's going to blow your minds. I own the mega-conglomerate that is issuing that advertisement contract tomorrow. I am the one who personally arranged for those 'free promotional meal tickets' to be slipped under your door. I knew exactly who you two were the second your feet crossed my threshold.\"",
-        "Dondré froze with his fork halfway to his mouth. Marcus didn't blink, but his eyebrows shot straight into his hairline.",
-        "\"See, I don't do standard corporate interviews,\" HighTower said, leaning back. \"I like to run a little sociological field test on my potential business partners. I anonymously gave your entire group an upfront, no-strings-attached luxury cash allowance and an elite hotel suite for the weekend just to see where your active focus actually lays before we ever sit down at a mahogany table.\"",
-        "HighTower chuckled, shaking his head. \"And boy, your buddies are putting on an absolute clinic in the club district right now! My venue first-in-command has been calling me every fifteen minutes giving me live audio-visual reports of their wonderful, loud-mouth activities.\"",
-        "\"Your boy Ty is currently outside a VIP lounge telling a bouncer he’s my new vice president, Bennie is trying to tax-write a round of shots on an account that doesn't exist, and Spoon is telling a crowd of women that I'm his uncle! If it were up to me based on them, I’d have to make your whole group disappear from the industry completely—hint, hint, look at my security guys, they don't even know how to smile!\"",
-        "The bodyguards remained perfectly expressionless, adding a terrifyingly funny punchline to the statement."
-        "\"But you two?\" HighTower smiled warmly, tapping the gold table. \"You two took the bait but ignored the hook. You stayed quiet, you stayed prepared, and you respected the architecture of the goal. So here’s how we're playing this move: The presentation tomorrow is officially canceled because you already won. You aren't just getting the advertisement deal. You two are coming directly to my private top-floor office tomorrow morning at 8:00 AM. We are signing an entirely restructured joint-venture partnership. You are getting direct equity shares, corporate board seats, and every single logistical term negotiated entirely in your favor.\"",
-        "The next morning at 10:30 AM, the high-rise corporate lobby doors burst open. Fly-Guy Ty, Big-Talk Bennie, and Shine-Time Spoon scrambled inside, looking completely disheveled, deeply hungover, and vibrating with sheer panic.",
-        "They spotted Dondré and Marcus sitting comfortably on pristine, million-dollar white Italian leather sofas in the center of the lobby, looking sharp, calm, and holding signed leather executive portfolios.",
-        "\"Oh thank god you guys are here!\" Ty panted, wiping sweat from his forehead. \"Man, we overslept, the alarm didn't go off, we had a wild night networking at the spots—wait, why are y'all looking at us like that? Let's go up and sign this contract!\"",
-        "Before Dondré could speak, the glass double doors of the executive suite opened. HighTower’s lead security guard stepped out, looking down at the trio with absolute zero-tolerance energy.",
-        "\"Mr. HighTower has explicitly stated that the loud-mouthed club patrons from last night are permanently barred from ascending to the executive floor. Security is cleared to remove them from the lobby immediately,\" the guard stated coldly."
-        "\"Wait, what?!\" Bennie yelled, his voice cracking. \"We are the partners! Dondré, tell him! Marcus, say something!\"",
-        "The trio began to frantically plead. The security detail stepped forward to escort them out, but Dondré stood up, raising his hand calmly.",
-        "\"Hold on,\" Dondré said, looking over at the guard. \"Tell Mr. HighTower that his new primary equity partners refuse to leave their original crew out in the cold. We handle our business as a unit.\"",
-        "The guard went silent, whispered into his earpiece, listened carefully for ten seconds, and then stepped back. \"Mr. HighTower agrees. He states that as his brand new corporate partners, the final verdict is completely on you. You hold the controlling shares. It's your move.\"",
-        "Dondré and Marcus slowly turned around, adjusting their jackets, looking directly at Ty, Bennie, and Spoon, who were standing there completely silent for the first time in 48 hours, trembling in their designer sneakers, waiting to see if they were about to be saved or permanently evicted.",
-        "Dondré looked at Marcus, Marcus slowly cracked a small, brilliant smile, turned back to the crew, and whispered: \"To be continued...\"",
-        "[THE LESSON OF THE LEDGER]: Most celebrations in life will cost you, or come dangerously close to costing you, the actual opportunity of a lifetime. True happiness and generational wealth aren't found in the applause of the crowd—they are secured in the empty rooms where the real work is recognized."
-    ];
-    let currentIdx = 0;
-    let isPlaying = false;
-    let voiceModeEnabled = false;
-    let paceWPM = 174;
-    let textSpeedUnits = 30; 
-    
-    let synth = window.speechSynthesis;
-    let voiceArray = [];
-    let activeUtterance = null;
-    let stepTimer = null;
+        <!-- Telemetry Tracker Dashboard Grid Row -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Completed</div>
+                <div class="metric-value" id="statsProgress">0%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Remaining</div>
+                <div class="metric-value" id="statsLinesLeft">0 lines</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Pace Metric</div>
+                <div class="metric-value" id="statsWPM">150 WPM</div>
+            </div>
+        </div>
+        <!-- Mode Dynamic System Grid Section -->
+        <div class="control-group">
+            <div class="control-header-row">
+                <div class="section-label">Audio Matrix Mode</div>
+                <div class="status-pill-text" id="statusModeLabel">NARRATION MODE ACTIVE</div>
+            </div>
+            <div class="toggle-switch-dock">
+                <button class="toggle-btn selected-active" id="modeNarrateBtn">Narrator Mode</button>
+                <button class="toggle-btn" id="modeScrollBtn">Text Scroll Only</button>
+            </div>
+        </div>
 
-    const masterPlayPauseBtn = document.getElementById('masterPlayPauseBtn');
-    const activeVoiceLabel = document.getElementById('activeVoiceLabel');
-    const linePrev = document.getElementById('linePrev');
-    const lineCurrent = document.getElementById('lineCurrent');
-    const lineNext = document.getElementById('lineNext');
-    const progressVal = document.getElementById('progressVal');
-    const remainingVal = document.getElementById('remainingVal');
-    const paceVal = document.getElementById('paceVal');
-    const narratorStatusPill = document.getElementById('narratorStatusPill');
-    const voiceOffBtn = document.getElementById('voiceOffBtn');
-    const voiceActiveBtn = document.getElementById('voiceActiveBtn');
-    const systemVoiceSelector = document.getElementById('systemVoiceSelector');
-    const speedUnitsLabel = document.getElementById('speedUnitsLabel');
-    const sliderTrack = document.getElementById('sliderTrack');
-    const sliderFill = document.getElementById('sliderFill');
-    const sliderThumb = document.getElementById('sliderThumb');
-    const scaleStandardBtn = document.getElementById('scaleStandardBtn');
-    const scaleLargeBtn = document.getElementById('scaleLargeBtn');
-    const livePulse = document.getElementById('livePulse');
+        <!-- Voice Matrix Profile Ingestion Dropdown Menu Selector -->
+        <div class="control-group" id="voiceSelectionContainer">
+            <div class="control-header-row">
+                <div class="section-label">System Voice Select Profile</div>
+            </div>
+            <select class="voice-selector-box" id="systemVoiceSelectorGrid">
+                <option value="">Ingesting operational local vocal matrix frameworks...</option>
+            </select>
+        </div>
+        <!-- Telemetry Tracker Pacing Matrix Slider Configuration Docks -->
+        <div class="control-group">
+            <div class="control-header-row">
+                <div class="section-label">Pacing Engine Rate Velocity</div>
+                <div class="status-pill-text" id="statusSpeedLabelValue">30 Units</div>
+            </div>
+            <div class="range-slider-track" id="telemetryPaceTrackSlider">
+                <div class="slider-bar-back"></div>
+                <div class="slider-bar-fill" id="trackSliderFillWidth" style="width: 30%;"></div>
+                <div class="slider-handle-thumb" id="trackSliderThumbAnchor" style="left: 30%;"></div>
+            </div>
+        </div>
+    </div>
 
-    function populateVocalMatrix() {
-        if (!synth) return;
-        voiceArray = synth.getVoices();
-        systemVoiceSelector.innerHTML = '';
+    <!-- Core Scripting Transmission Pipeline Initialization Layer -->
+    <script>
+        // ==================================================================================================
+        // FAMO NATION DECENTRALIZED DATA CHANNEL MATRIX PIPELINE
+        // ==================================================================================================
+        const DYNAMIC_RAW_ENDPOINT = 'https://raw.githubusercontent.com/rap1033ssmm-crypto/rap1033ssmm-crypto/main/story.txt';
+
+        // Master Application Working State Variables
+        let storyScriptLines = ["[System Data Matrix Standby Initialization]"];
+        let currentIdx = 0;
+        let isPlaying = false;
+        let voiceModeEnabled = false;
+        let paceWPM = 174;
+        let textSpeedUnits = 30;
         
-        voiceArray.forEach((voice) => {
-            const option = document.createElement('option');
-            option.textContent = `${voice.name} (${voice.lang})`;
-            option.setAttribute('data-name', voice.name);
-            systemVoiceSelector.appendChild(option);
-        });
-
-        if(voiceArray.length > 0) {
-            activeVoiceLabel.innerText = "Voice: Native Engine Primed";
-        }
-    }
-
-    if (synth && synth.onvoiceschanged !== undefined) {
-        synth.onvoiceschanged = populateVocalMatrix;
-    }
-    populateVocalMatrix();
-    function updateDisplayMetrics() {
-        linePrev.innerText = currentIdx > 0 ? storyScriptLines[currentIdx - 1] : "---";
-        lineCurrent.innerText = storyScriptLines[currentIdx];
-        lineNext.innerText = currentIdx < storyScriptLines.length - 1 ? storyScriptLines[currentIdx + 1] : "---";
-
-        const progressPercentage = Math.round(((currentIdx + 1) / storyScriptLines.length) * 100);
-        const linesLeft = storyScriptLines.length - (currentIdx + 1);
-
-        progressVal.innerText = `${progressPercentage}%`;
-        remainingVal.innerText = `${linesLeft} lines`;
-        paceVal.innerText = `${paceWPM} WPM`;
-    }
-
-    function executeNextPipelineStep() {
-        if (!isPlaying) return;
-        updateDisplayMetrics();
-
-        if (voiceModeEnabled && synth) {
+        // Native Edge Speech Components
+        let synth = window.speechSynthesis;
+        let voiceArray = [];
+        let activeUtterance = null;
+        let stepTimer = null;
+        // Interface Console Component DOM Selectors
+        const masterPlayPauseBtn = document.getElementById('masterPlayPauseBtn');
+        const activeVoiceLabel = document.getElementById('activeVoiceLabel');
+        const linePrev = document.getElementById('linePrev');
+        const lineCurrent = document.getElementById('lineCurrent');
+        const lineNext = document.getElementById('lineNext');
+        const progressVal = document.getElementById('progressVal');
+        const remainingVal = document.getElementById('remainingVal');
+        const paceVal = document.getElementById('paceVal');
+        const narratorStatusPill = document.getElementById('narratorStatusPill');
+        const voiceOffBtn = document.getElementById('voiceOffBtn');
+        const voiceActiveBtn = document.getElementById('voiceActiveBtn');
+        const systemVoiceSelector = document.getElementById('systemVoiceSelector');
+        const speedUnitsLabel = document.getElementById('speedUnitsLabel');
+        const sliderTrack = document.getElementById('sliderTrack');
+        const sliderFill = document.getElementById('sliderFill');
+        const sliderThumb = document.getElementById('sliderThumb');
+        const scaleStandardBtn = document.getElementById('scaleStandardBtn');
+        const scaleLargeBtn = document.getElementById('scaleLargeBtn');
+        const livePulse = document.getElementById('livePulse');
+        // ==================================================================================================
+        // ASYNCHRONOUS DATA PIPELINE FETCH INGESTION NODE
+        // ==================================================================================================
+        async function loadDynamicStoryPayload() {
             try {
-                synth.cancel(); 
-                activeUtterance = new SpeechSynthesisUtterance(storyScriptLines[currentIdx]);
-                const selectedName = systemVoiceSelector.selectedOptions?.getAttribute('data-name');
-                const targetVoice = voiceArray.find(v => v.name === selectedName);
-                if (targetVoice) activeUtterance.voice = targetVoice;
-                activeUtterance.rate = textSpeedUnits / 30; 
-
-                activeUtterance.onend = () => { advancePositionIndex(); };
-                activeUtterance.onerror = () => { advancePositionIndex(); };
-                synth.speak(activeUtterance);
-            } catch (e) {
-                const wordsInLine = storyScriptLines[currentIdx].split(' ').length;
-                const scrollIntervalDelay = Math.max(3000, (wordsInLine * 60000) / paceWPM);
-                stepTimer = setTimeout(advancePositionIndex, scrollIntervalDelay);
+                const clearEndpoint = 'https://raw.githubusercontent.com/rap1033ssmm-crypto/rap1033ssmm-crypto/main/story.txt';
+                lineCurrent.innerText = "Connecting to decentralized data stream registry...";
+                
+                const response = await fetch(`${clearEndpoint}?t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error('Data drop offline');
+                const rawText = await response.text();
+                
+                storyScriptLines = rawText.split('\n')
+                                          .map(line => line.trim())
+                                          .filter(line => line.length > 0);
+                                          
+                if (storyScriptLines.length === 0) {
+                    storyScriptLines = ["[Empty Data Stream File]"];
+                }
+                
+                currentIdx = 0;
+                updateDisplayMetrics();
+            } catch (error) {
+                lineCurrent.innerText = "[Matrix Error: Check story.txt link configuration]";
+                console.error(error);
             }
-        } else {
-            const wordsInLine = storyScriptLines[currentIdx].split(' ').length;
-            const scrollIntervalDelay = Math.max(3000, (wordsInLine * 60000) / paceWPM);
-            stepTimer = setTimeout(advancePositionIndex, scrollIntervalDelay);
         }
-    }
+        // ==================================================================================================
+        // SYSTEM VOCAL PROFILES MATRIX INGESTION
+        // ==================================================================================================
+        function populateVocalMatrix() {
+            if (!synth) return;
+            voiceArray = synth.getVoices();
+            systemVoiceSelector.innerHTML = '';
+            
+            voiceArray.forEach((voice) => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.setAttribute('data-name', voice.name);
+                systemVoiceSelector.appendChild(option);
+            });
+            
+            if (voiceArray.length > 0) {
+                activeVoiceLabel.innerText = "Voice: Native Engine Primed";
+            }
+        }
 
-    function advancePositionIndex() {
-        if (currentIdx < storyScriptLines.length - 1) {
+        if (synth && synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = populateVocalMatrix;
+        }
+        populateVocalMatrix();
+        // ==================================================================================================
+        // TELEMETRY TRACKING CALCULATIONS & METRICS MONITOR
+        // ==================================================================================================
+        function updateDisplayMetrics() {
+            if (storyScriptLines.length === 0) return;
+            
+            // Track dynamic list index boundaries
+            const previousText = currentIdx > 0 ? storyScriptLines[currentIdx - 1] : "---";
+            const currentText = storyScriptLines[currentIdx];
+            const nextText = currentIdx < storyScriptLines.length - 1 ? storyScriptLines[currentIdx + 1] : "---";
+            
+            // Push texts directly into the UI viewport element blocks
+                        lineCurrent.innerText = currentText;
+
+            
+            // Calculate ledger percentage ratios
+            const progress = Math.round(((currentIdx + 1) / storyScriptLines.length) * 100);
+            const linesRemaining = storyScriptLines.length - (currentIdx + 1);
+            
+            progressVal.innerText = `${progress}%`;
+            remainingVal.innerText = `${linesRemaining} lines`;
+            paceVal.innerText = `${paceWPM} WPM`;
+        }
+        // ==================================================================================================
+        // STEP SEQUENCE AUTOMATION ENGINE
+        // ==================================================================================================
+        function executeNextPipelineStep() {
+            if (currentIdx >= storyScriptLines.length) {
+                currentIdx = 0;
+                toggleExecutionState(false);
+                updateDisplayMetrics();
+                return;
+            }
+
+            updateDisplayMetrics();
+            const currentLineText = storyScriptLines[currentIdx];
+
+            if (voiceModeEnabled && synth) {
+                synth.cancel();
+                activeUtterance = new SpeechSynthesisUtterance(currentLineText);
+                
+                const selectedOption = systemVoiceSelector.selectedOptions[0];
+                if (selectedOption) {
+                    const voiceName = selectedOption.getAttribute('data-name');
+                    const matchedVoice = voiceArray.find(v => v.name === voiceName);
+                    if (matchedVoice) activeUtterance.voice = matchedVoice;
+                }
+
+                activeUtterance.rate = textSpeedUnits / 30;
+
+                activeUtterance.onend = function() {
+                    if (isPlaying) {
+                        currentIdx++;
+                        executeNextPipelineStep();
+                    }
+                };
+
+                activeUtterance.onerror = function() {
+                    clearTimeout(stepTimer);
+                    stepTimer = setTimeout(() => {
+                        if (isPlaying) advanceIndexStep();
+                    }, 2000);
+                };
+
+                synth.speak(activeUtterance);
+            } else {
+                const wordCount = currentLineText.split(/\s+/).length;
+                const scrollingDelay = Math.max(2000, (wordCount / paceWPM) * 60000);
+                
+                clearTimeout(stepTimer);
+                stepTimer = setTimeout(() => {
+                    if (isPlaying) advanceIndexStep();
+                }, scrollingDelay);
+            }
+        }
+
+        function advanceIndexStep() {
             currentIdx++;
             executeNextPipelineStep();
-        } else {
-            currentIdx = 0;
-            toggleExecutionState(false);
-            updateDisplayMetrics();
-            lineCurrent.innerText = "Stream Cycle Completed. Click to restart.";
         }
-    }
+        // ==================================================================================================
+        // STATE EXECUTION CONTROLLERS & PLAYBACK TOGGLES
+        // ==================================================================================================
+              function toggleExecutionState(forceState) {
+            isPlaying = forceState !== undefined ? forceState : !isPlaying;
 
-    function toggleExecutionState(forceState) {
-        isPlaying = forceState !== undefined ? forceState : !isPlaying;
-        if (isPlaying) {
-            masterPlayPauseBtn.innerText = "❚❚";
-            livePulse.style.backgroundColor = "#26b226"; 
-            livePulse.style.boxShadow = "0 0 10px #26b226";
-            executeNextPipelineStep();
-        } else {
-            masterPlayPauseBtn.innerText = "▶";
-            livePulse.style.backgroundColor = "#3b82f6"; 
-            livePulse.style.boxShadow = "0 0 10px #3b82f6";
-            if (synth) synth.cancel();
-            clearTimeout(stepTimer);
+            if (isPlaying) {
+                masterPlayPauseBtn.innerText = "❚❚";
+                masterPlayPauseBtn.style.backgroundColor = "var(--accent-green)";
+                if (livePulse) {
+                    livePulse.style.backgroundColor = "var(--accent-green)";
+                    livePulse.style.boxShadow = "0 0 10px var(--accent-green)";
+                }
+                executeNextPipelineStep();
+            } else {
+                masterPlayPauseBtn.innerText = "▶";
+                masterPlayPauseBtn.style.backgroundColor = "var(--accent-blue)";
+                if (livePulse) {
+                    livePulse.style.backgroundColor = "var(--accent-blue)";
+                    livePulse.style.boxShadow = "0 0 10px var(--accent-blue)";
+                }
+                clearTimeout(stepTimer);
+                if (synth) synth.cancel();
+            }
         }
-    }
 
-    masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());
+        masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());
+        // ==================================================================================================
+        // SOVEREIGN INITIALIZATION MATRIX TRIGGER
+        // ==================================================================================================
+        // Boots the network ingestion data channel automatically on layout load
+        window.addEventListener('DOMContentLoaded', () => {
+                        loadDynamicStoryPayload();
 
-    voiceActiveBtn.addEventListener('click', () => {
-        voiceModeEnabled = true;
-        voiceActiveBtn.classList.add('selected-active');
-        voiceOffBtn.classList.remove('selected-active');
-        narratorStatusPill.innerText = "Active";
-        narratorStatusPill.style.color = "#26b226";
-        
-        const fullVoiceName = systemVoiceSelector.selectedOptions?.innerText.split(' (');
-        if (fullVoiceName) activeVoiceLabel.innerText = `Voice: ${fullVoiceName[0]}`;
-        
-        if (isPlaying) { clearTimeout(stepTimer); executeNextPipelineStep(); }
-    });
-
-    voiceOffBtn.addEventListener('click', () => {
-        voiceModeEnabled = false;
-        voiceOffBtn.classList.add('selected-active');
-        voiceActiveBtn.classList.remove('selected-active');
-        narratorStatusPill.innerText = "Muted";
-        narratorStatusPill.style.color = "var(--accent-blue)";
-        activeVoiceLabel.innerText = "Voice: Muted";
-        if (synth) synth.cancel();
-        if (isPlaying) { clearTimeout(stepTimer); executeNextPipelineStep(); }
-    });
-
-    systemVoiceSelector.addEventListener('change', () => {
-        const fullVoiceName = systemVoiceSelector.selectedOptions?.innerText.split(' (');
-        if (fullVoiceName && voiceModeEnabled) activeVoiceLabel.innerText = `Voice: ${fullVoiceName[0]}`;
-        if (isPlaying && voiceModeEnabled) {
-            clearTimeout(stepTimer);
-            executeNextPipelineStep();
-        }
-    });
-
-    sliderTrack.addEventListener('click', (e) => {
-        const boundingBox = sliderTrack.getBoundingClientRect();
-        const mouseXPosition = e.clientX - boundingBox.left;
-        let percentageTrack = Math.min(100, Math.max(0, (mouseXPosition / boundingBox.width) * 100));
-        sliderThumb.style.left = `${percentageTrack}%`;
-        sliderFill.style.width = `${percentageTrack}%`;
-        textSpeedUnits = Math.round((percentageTrack / 100) * 85) + 5; 
-        speedUnitsLabel.innerText = `${textSpeedUnits} units`;
-        paceWPM = Math.round(120 + (textSpeedUnits * 1.8));
-        paceVal.innerText = `${paceWPM} WPM`;
-        if (isPlaying) { clearTimeout(stepTimer); executeNextPipelineStep(); }
-    });
-
-    scaleLargeBtn.addEventListener('click', () => {
-        scaleLargeBtn.classList.add('selected-active');
-        scaleStandardBtn.classList.remove('selected-active');
-        lineCurrent.style.fontSize = "22px";
-    });
-
-    scaleStandardBtn.addEventListener('click', () => {
-        scaleStandardBtn.classList.add('selected-active');
-        scaleLargeBtn.classList.remove('selected-active');
-        lineCurrent.style.fontSize = "16px";
-    });
-
-    updateDisplayMetrics();
-</script>
+        });
+    </script>
 </body>
 </html>
