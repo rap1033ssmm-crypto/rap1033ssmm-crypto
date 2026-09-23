@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voice: Nexus Prime (Holographic Ambient)</title>
-    <style>
+     <style>
         :root {
             --bg-color: #0d0f14;
             --surface-color: #14161e;
@@ -14,93 +14,111 @@
             --text-main: #ffffff;
             --text-muted: #4b526d;
             --text-stats: #707793;
-            --gold: #d4af37;
         }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             padding: 20px;
-            display: flex;
+    display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-        }
-        .player-console {
-            background-color: var(--surface-color);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 420px;
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            border: 1px solid var(--border-color);
             box-sizing: border-box;
         }
+
+       .player-console {
+    background-color: var(--surface-color);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 440px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
         .voice-mode-indicator {
             background-color: #1a1c23;
             border-radius: 16px;
-            padding: 12px 16px;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
             border: 1px solid #282a36;
         }
+
         .voice-status-group {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .pulse-dot {
             width: 8px;
             height: 8px;
-            background-color: #3b82f6;
+            background-color: var(--accent-blue);
             border-radius: 50%;
-            box-shadow: 0 0 10px #3b82f6;
+            box-shadow: 0 0 10px var(--accent-blue);
             transition: all 0.3s ease;
         }
+
         .voice-title-label {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             letter-spacing: 0.7px;
             color: #f1f2f6;
             text-transform: uppercase;
         }
+
         .action-icon-circle {
-            width: 32px;
-            height: 32px;
-            background-color: #282a36;
+            width: 36px;
+            height: 36px;
+            background-color: var(--accent-blue);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 14px;
             cursor: pointer;
             color: #ffffff;
             border: none;
             transition: all 0.2s ease;
         }
+
         .text-display-gate {
-            height: 140px;
+            height: 180px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             text-align: center;
             margin-bottom: 24px;
             overflow: hidden;
-            position: relative;
+            background-color: #0b0c10;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            box-sizing: border-box;
         }
+
         .display-line {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted);
             margin: 8px 0;
-            opacity: 0.4;
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0.3;
+            transition: all 0.3s ease;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .display-line.active-focus {
             font-size: 16px;
             color: var(--text-main);
@@ -110,124 +128,115 @@
             overflow: visible;
             transform: scale(1.02);
         }
+
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 20px;
+            gap: 8px;
         }
+
         .metric-card {
             border-right: 1px solid var(--border-color);
         }
+
         .metric-card:last-child {
             border-right: none;
         }
+
         .metric-label {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-stats);
             margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
         .metric-value {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--text-main);
         }
+
         .control-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
+
         .control-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
+
         .section-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #f1f2f6;
-        }
-        .status-pill-text {
             font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pill-text {
+            font-size: 11px;
             color: var(--accent-blue);
             font-weight: 600;
-            transition: color 0.3s ease;
         }
+
         .toggle-switch-dock {
-            background-color: var(--bg-color);
-            border-radius: 14px;
+            background-color: #0d0f14;
+            border-radius: 12px;
             padding: 4px;
             display: flex;
             gap: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
         }
+
         .toggle-btn {
             flex: 1;
             background-color: transparent;
             color: var(--text-stats);
             border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            font-family: inherit;
             transition: all 0.2s ease;
         }
+
         .toggle-btn.selected-active {
             background-color: var(--accent-blue);
             color: var(--text-main);
         }
+
         .voice-selector-box {
-            background: #11141a;
+            background: #0d0f14;
             color: #ffffff;
             border: 1px solid var(--border-color);
             padding: 10px;
             border-radius: 8px;
             width: 100%;
-            font-family: inherit;
             font-size: 13px;
-            margin-top: 8px;
-            box-sizing: border-box;
             outline: none;
+            box-sizing: border-box;
         }
-        .range-slider-track {
-            position: relative;
-            padding: 12px 0;
-            cursor: pointer;
-            user-select: none;
+
+        .range-slider-wrap {
+            padding: 8px 0;
         }
-        .slider-bar-back {
-            height: 4px;
-            background-color: var(--border-color);
-            border-radius: 2px;
+
+        input[type="range"] {
             width: 100%;
-        }
-        .slider-bar-fill {
-            height: 4px;
-            background-color: var(--accent-blue);
-            border-radius: 2px;
-            position: absolute;
-            top: 12px;
-            left: 0;
-            transition: background-color 0.3s ease;
-        }
-        .slider-handle-thumb {
-            width: 16px;
-            height: 16px;
-            background-color: var(--accent-blue);
-            border-radius: 50%;
-            position: absolute;
-            top: 6px;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-            transform: translateX(-50%);
-            transition: background-color 0.3s ease;
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+            margin: 0;
         }
     </style>
-</head>
+
 <body>
     <div class="player-console">
         <div class="voice-mode-indicator">
