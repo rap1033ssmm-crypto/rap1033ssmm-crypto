@@ -236,27 +236,29 @@
                 <div class="voice-title-label" id="activeVoiceLabel">Voice: Nexus Prime</div>
             </div>
             <button class="action-icon-circle" id="masterPlayPauseBtn">▶</button>
-        </div>
-        <!-- Kinetic Scrolling Node Window Box -->
+             <!-- Kinetic Scrolling Node Window Box -->
         <div class="text-display-gate" id="textViewportGate">
+            <div class="display-line" id="linePrev">---</div>
             <div class="display-line active-focus" id="lineCurrent">[System Standby: Initiating...]</div>
+            <div class="display-line" id="lineNext">---</div>
         </div>
 
-        <!-- Telemetry Tracker Dashboard Grid Row -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-label">Completed</div>
-                <div class="metric-value" id="statsProgress">0%</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Remaining</div>
-                <div class="metric-value" id="statsLinesLeft">0 lines</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Pace Metric</div>
-                <div class="metric-value" id="statsWPM">150 WPM</div>
-            </div>
-        </div>
+       <!-- Telemetry Tracker Dashboard Grid Row -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-label">Completed</div>
+        <div class="metric-value" id="progressVal">0%</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Remaining</div>
+        <div class="metric-value" id="remainingVal">0 lines</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Pace Metric</div>
+        <div class="metric-value" id="paceVal">150 WPM</div>
+    </div>
+</div>
+
         <!-- Mode Dynamic System Grid Section -->
         <div class="control-group">
             <div class="control-header-row">
@@ -269,27 +271,27 @@
             </div>
         </div>
 
-        <!-- Voice Matrix Profile Ingestion Dropdown Menu Selector -->
+               <!-- Voice Matrix Profile Ingestion Dropdown Menu Selector -->
         <div class="control-group" id="voiceSelectionContainer">
             <div class="control-header-row">
                 <div class="section-label">System Voice Select Profile</div>
             </div>
-            <select class="voice-selector-box" id="systemVoiceSelectorGrid">
+            <select class="voice-selector-box" id="systemVoiceSelector">
                 <option value="">Ingesting operational local vocal matrix frameworks...</option>
             </select>
         </div>
-        <!-- Telemetry Tracker Pacing Matrix Slider Configuration Docks -->
+
+                <!-- Telemetry Tracker Pacing Matrix Slider Configuration Docks -->
         <div class="control-group">
             <div class="control-header-row">
                 <div class="section-label">Pacing Engine Rate Velocity</div>
-                <div class="status-pill-text" id="statusSpeedLabelValue">30 Units</div>
+                <div class="status-pill-text" id="speedUnitsLabel">30 Units</div>
             </div>
-            <div class="range-slider-track" id="telemetryPaceTrackSlider">
-                <div class="slider-bar-back"></div>
-                <div class="slider-bar-fill" id="trackSliderFillWidth" style="width: 30%;"></div>
-                <div class="slider-handle-thumb" id="trackSliderThumbAnchor" style="left: 30%;"></div>
+            <div style="padding: 12px 0;">
+                <input type="range" id="sliderTrack" min="1" max="100" value="30" style="width: 100%; accent-color: var(--accent-blue); cursor: pointer;">
             </div>
         </div>
+
     </div>
 
     <!-- Core Scripting Transmission Pipeline Initialization Layer -->
@@ -463,10 +465,10 @@
             currentIdx++;
             executeNextPipelineStep();
         }
-        // ==================================================================================================
+               // ==================================================================================================
         // STATE EXECUTION CONTROLLERS & PLAYBACK TOGGLES
         // ==================================================================================================
-              function toggleExecutionState(forceState) {
+        function toggleExecutionState(forceState) {
             isPlaying = forceState !== undefined ? forceState : !isPlaying;
 
             if (isPlaying) {
@@ -474,7 +476,7 @@
                 masterPlayPauseBtn.style.backgroundColor = "var(--accent-green)";
                 if (livePulse) {
                     livePulse.style.backgroundColor = "var(--accent-green)";
-                    livePulse.style.boxShadow = "0 0 10px var(--accent-green)";
+                    livePulse.style.boxShadow = "0px 0px 10px var(--accent-green)";
                 }
                 executeNextPipelineStep();
             } else {
@@ -482,12 +484,62 @@
                 masterPlayPauseBtn.style.backgroundColor = "var(--accent-blue)";
                 if (livePulse) {
                     livePulse.style.backgroundColor = "var(--accent-blue)";
-                    livePulse.style.boxShadow = "0 0 10px var(--accent-blue)";
+                    livePulse.style.boxShadow = "0px 0px 10px var(--accent-blue)";
                 }
                 clearTimeout(stepTimer);
                 if (synth) synth.cancel();
             }
         }
+
+        masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());
+
+        // Interface Console Component Mode Switchers
+        function updateUIVoiceMatrixState(mode) {
+            voiceModeEnabled = (mode === 'narrate');
+            const statusModeLabel = document.getElementById('statusModeLabel');
+            const modeNarrateBtn = document.getElementById('modeNarrateBtn');
+            const modeScrollBtn = document.getElementById('modeScrollBtn');
+            const voiceSelectionContainer = document.getElementById('voiceSelectionContainer');
+            
+            if (voiceModeEnabled) {
+                if (statusModeLabel) statusModeLabel.innerText = "NARRATION MODE ACTIVE";
+                if (modeNarrateBtn) modeNarrateBtn.classList.add('selected-active');
+                if (modeScrollBtn) modeScrollBtn.classList.remove('selected-active');
+                if (voiceSelectionContainer) voiceSelectionContainer.style.display = 'block';
+            } else {
+                if (statusModeLabel) statusModeLabel.innerText = "TEXT SCROLL SCENARIO ONLY";
+                if (modeNarrateBtn) modeNarrateBtn.classList.remove('selected-active');
+                if (modeScrollBtn) modeScrollBtn.classList.add('selected-active');
+                if (voiceSelectionContainer) voiceSelectionContainer.style.display = 'none';
+                if (synth) synth.cancel();
+            }
+            if (isPlaying) {
+                clearTimeout(stepTimer);
+                executeNextPipelineStep();
+            }
+        }
+
+        const domModeNarrateBtn = document.getElementById('modeNarrateBtn');
+        const domModeScrollBtn = document.getElementById('modeScrollBtn');
+        if (domModeNarrateBtn) domModeNarrateBtn.addEventListener('click', () => updateUIVoiceMatrixState('narrate'));
+        if (domModeScrollBtn) domModeScrollBtn.addEventListener('click', () => updateUIVoiceMatrixState('scroll'));
+
+        // Handle Active Native Range Slider Interactivity Calculations
+        if (sliderTrack) {
+            sliderTrack.addEventListener('input', (e) => {
+                textSpeedUnits = parseInt(e.target.value);
+                paceWPM = Math.round(120 + (textSpeedUnits * 1.8));
+                if (speedUnitsLabel) speedUnitsLabel.innerText = `${textSpeedUnits} Units`;
+                
+                if (isPlaying) {
+                    clearTimeout(stepTimer);
+                    executeNextPipelineStep();
+                } else {
+                    updateDisplayMetrics();
+                }
+            });
+        }
+
 
         masterPlayPauseBtn.addEventListener('click', () => toggleExecutionState());
         // ==================================================================================================
