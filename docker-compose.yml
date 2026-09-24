@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # ==============================================================================================
+  # SYSTEM 1: APPSMITH - THE LIQUID CHROME COCKPIT INTERFACE DASHBOARD
+  # ==============================================================================================
+  famo-appsmith:
+    image: appsmith/appsmith-ce:latest
+    container_name: famo_appsmith_cockpit
+    ports:
+      - "8080:80"
+      - "8443:443"
+    environment:
+      - APPSMITH_ENCRYPTION_PASSWORD=famo_encryption_token_2026
+      - APPSMITH_ENCRYPTION_SALT=famo_salt_token_2026
+    volumes:
+      - appsmith_vault:/appsmith-stacks
+    networks:
+      - famo_overlord_mesh
+    restart: always
+
+  # ==============================================================================================
+  # SYSTEM 2: APPRISE API - THE RADAR MULTI-CHANNEL NOTIFICATION ENGINE
+  # ==============================================================================================
+  famo-apprise:
+    image: caronc/apprise:latest
+    container_name: famo_apprise_radar
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ID=famo-notification-core
+    networks:
+      - famo_overlord_mesh
+    restart: always
+
+  # ==============================================================================================
+  # SYSTEM 4: SEAWEEDFS - THE HYPER-SPEED DISTRIBUTED FILE STORAGE SWARM
+  # ==============================================================================================
+  famo-seaweed-master:
+    image: chrislusf/seaweedfs:latest
+    container_name: famo_storage_master
+    ports:
+      - "9333:9333"
+    command: "master -ip=famo-seaweed-master"
+    volumes:
+      - seaweed_master_vault:/data
+    networks:
+      - famo_overlord_mesh
+    restart: always
+
+  famo-seaweed-volume:
+    image: chrislusf/seaweedfs:latest
+    container_name: famo_storage_volume
+    ports:
+      - "8081:8080"
+    command: "volume -mserver=famo-seaweed-master:9333 -port=8080"
+    volumes:
+      - seaweed_volume_vault:/data
+    depends_on:
+      - famo-seaweed-master
+    networks:
+      - famo_overlord_mesh
+    restart: always
+
+  # ==============================================================================================
+  # SYSTEM 7: FREESWITCH - THE TELECOM VOICE RECEPTOR CHANNEL CARRIER
+  # ==============================================================================================
+  famo-freeswitch:
+    image: signalwire/freeswitch:latest
+    container_name: famo_telecom_carrier
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "5080:5080/udp"
+      - "5080:5080/tcp"
+      - "8021:8021/tcp"
+    volumes:
+      - freeswitch_config_vault:/etc/freeswitch
+      - freeswitch_log_vault:/var/log/freeswitch
+    networks:
+      - famo_overlord_mesh
+    restart: always
+
+networks:
+  famo_overlord_mesh:
+    driver: bridge
+
+volumes:
+  appsmith_vault:
+  seaweed_master_vault:
+  seaweed_volume_vault:
+  freeswitch_config_vault:
+  freeswitch_log_vault:
