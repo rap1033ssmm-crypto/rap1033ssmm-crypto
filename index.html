@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Famo-Legacy OmniSphere // Entertainment Syndicate Console</title>
+    <style>
+        :root {
+            --bg-dark: #0a0b0d;
+            --surface-panel: #12141a;
+            --border-line: #1e222b;
+            --gold-accent: #d4af37;
+            --text-bright: #ffffff;
+            --text-dim: #717b99;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-bright);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sovereign Header Bar Layout Block */
+        .syndicate-header {
+            background: linear-gradient(to bottom, rgba(10,11,13,1) 0%, rgba(10,11,13,0) 100%);
+            padding: 20px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        .brand-logo h1 {
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold-accent);
+            font-weight: 900;
+        }
+
+        .brand-logo p {
+            margin: 2px 0 0 0;
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        /* Hero Spotlight Stage Section */
+        .hero-banner {
+            height: 75vh;
+            position: relative;
+            background: linear-gradient(to right, rgba(10,11,13,0.9) 30%, rgba(10,11,13,0.2) 100%), 
+                        url('https://unsplash.com') center/cover;
+            display: flex;
+            align-items: center;
+            padding: 0 4%;
+            border-bottom: 2px solid var(--gold-accent);
+        }
+
+        .hero-content {
+            max-width: 600px;
+            margin-top: 60px;
+        }
+
+        .hero-tag {
+            color: var(--gold-accent);
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            margin: 0 0 15px 0;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .hero-desc {
+            font-size: 16px;
+            color: #9ca3af;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .hero-btn {
+            background-color: var(--gold-accent);
+            color: #000;
+            border: none;
+            padding: 12px 28px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .hero-btn:hover { transform: scale(1.05); }
+
+        /* Multi-Row Carousel Section Layouts */
+        .carousel-container {
+            padding: 40px 0 40px 4%;
+            margin-top: -60px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .row-wrapper {
+            margin-bottom: 40px;
+        }
+
+        .row-title {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            border-left: 3px solid var(--gold-accent);
+            padding-left: 10px;
+        }
+
+        .slider-track {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scroll-behavior: smooth;
+        }
+
+        .slider-track::-webkit-scrollbar {
+            height: 6px;
+        }
+        .slider-track::-webkit-scrollbar-thumb {
+            background-color: var(--border-line);
+            border-radius: 3px;
+        }
+
+        .card-node {
+            min-width: 280px;
+            width: 280px;
+            height: 158px;
+            background-color: var(--surface-panel);
+            border: 1px solid var(--border-line);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-decoration: none;
+        }
+
+        .card-node:hover {
+            transform: scale(1.06);
+            border-color: var(--gold-accent);
+            z-index: 10;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .card-img-mock {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(45deg, #161922 0%, #232836 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: var(--gold-accent);
+        }
+
+        .card-meta {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            background: linear-gradient(to top, rgba(10,11,13,0.95) 0%, rgba(10,11,13,0) 100%);
+        }
+
+        .card-meta h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .card-meta span {
+            font-size: 10px;
+            color: var(--gold-accent);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .system-footer {
+            text-align: center;
+            padding: 40px;
+            font-size: 11px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border-line);
+            margin-top: 40px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Marquee Block -->
+    <header class="syndicate-header">
+        <div class="brand-logo">
+            <h1>OmniSphere</h1>
+            <p>REGISTRY LEDGER: ISSN 3143-9756 // ENTERPRISE MULTI-CHANNEL GRID</p>
+        </div>
+    </header>
+
+    <!-- Hero Spotlight Stage -->
+    <section class="hero-banner">
+        <div class="hero-content">
+            <div class="hero-tag">Live System Spotlight</div>
+            <h2 class="hero-title">Lyrics and Flow</h2>
+            <p class="hero-desc">The premiere decentralized rap tournament arena. Enter the arena, submit your multi-media visual footprints, record live microphone audio drops, and challenge the global matrix ledger live on autopilot.</p>
+            <button class="hero-btn" onclick="window.location.href='story-stream.html'">Enter Story Stream</button>
+        </div>
+    </section>
+
+    <!-- Multi-Row Slide Aggregations -->
+    <main class="carousel-container">
+        
+        <!-- ROW 1: CORE CHANNELS -->
+        <div class="row-wrapper">
+            <div class="row-title">Active Broadcast Network Channels</div>
+            <div class="slider-track">
+                <a href="story-stream.html" class="card-node">
+                    <div class="card-img-mock">📺</div>
+                    <div class="card-meta">
+                        <h4>Story Stream Portal</h4>
+                        <span>CH-01 // Live Video</span>
+                    </div>
+                </a>
+                <a href="docker-compose.yml" class="card-node">
+                    <div class="card-img-mock">🐳</div>
+                    <div class="card-meta">
+                        <h4>Docker Infras Node</h4>
+                        <span>CH-02 // Orchestrator</span>
+                    </div>
+                </a>
+                <a href="README.md" class="card-node">
+                    <div class="card-img-mock">📜</div>
+                    <div class="card-meta">
+                        <h4>Main Profile Index</h4>
+                        <span>CH-03 // Ledger Registry</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- ROW 2: FORKED UTILITIES -->
+        <div class="row-wrapper">
+            <div class="row-title">Sovereign Management Cockpit Nodes</div>
+            <div class="slider-track">
+                <a href="https://github.com" class="card-node" target="_blank">
+                    <div class="card-img-mock">🎛️</div>
+                    <div class="card-meta">
+                        <h4>Appsmith Dashboard</h4>
+                        <span>NODE-01 // Control Panel</span>
+                    </div>
+                </a>
+                <a href="https://github.com" class="card-node" target="_blank">
+                    <div class="card-img-mock">📡</div>
+                    <div class="card-meta">
+                        <h4>Apprise Alerts API</h4>
+                        <span>NODE-02 // Notification Hub</span>
+                    </div>
+                </a>
+                <a href="https://github.com" class="card-node" target="_blank">
+                    <div class="card-img-mock">🗺️</div>
+                    <div class="card-meta">
+                        <h4>OpenLayers Radar</h4>
+                        <span>NODE-03 // Spatial Map</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="system-footer">
+        FAMO NATION ORGANIZATION CENTRAL COMMAND PANEL // EDGE ARCHITECTURE // 2026
+    </footer>
+
+</body>
+</html>
