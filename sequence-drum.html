@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Famo Nation Media Records // CyberTrap Beat Studio</title>
+    <style>
+        :root {
+            --bg-dark: #0a0b0d;
+            --surface-panel: #12141a;
+            --border-line: #1e222b;
+            --gold-accent: #d4af37;
+            --text-bright: #ffffff;
+            --text-dim: #717b99;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-bright);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .studio-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--surface-panel);
+            border: 2px solid var(--gold-accent);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            margin-top: 40px;
+        }
+
+        .studio-header {
+            text-align: center;
+            border-bottom: 1px dashed var(--border-line);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .studio-header h1 {
+            color: var(--gold-accent);
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 900;
+        }
+
+        .studio-header p {
+            margin: 5px 0 0 0;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* MPC Grid Matrix Controls */
+        .mpc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .drum-pad {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #1c1f26 0%, #0d0f13 100%);
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            color: var(--gold-accent);
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s ease;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
+        }
+
+        .drum-pad:active, .drum-pad.playing {
+            background: var(--gold-accent);
+            color: #000000;
+            transform: scale(0.96);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .pad-key {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+        .drum-pad:active .pad-key, .drum-pad.playing .pad-key {
+            color: #333;
+        }
+
+        .system-footer {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="studio-container">
+        <header class="studio-header">
+            <h1>CyberTrap MPC Sampler</h1>
+            <p>Famo Nation Media Records // Master Registry: ISSN 3143-9756</p>
+        </header>
+
+        <!-- The 16 Pad MPC Drum Grid Matrix Layout -->
+        <main class="mpc-grid">
+            <div class="drum-pad" onclick="playSound(60, this)">PAD 01<span class="pad-key">Kick 1</span></div>
+            <div class="drum-pad" onclick="playSound(62, this)">PAD 02<span class="pad-key">Kick 2</span></div>
+            <div class="drum-pad" onclick="playSound(64, this)">PAD 03<span class="pad-key">Snare 1</span></div>
+            <div class="drum-pad" onclick="playSound(65, this)">PAD 04<span class="pad-key">Snare 2</span></div>
+            
+            <div class="drum-pad" onclick="playSound(67, this)">PAD 05<span class="pad-key">Clap</span></div>
+            <div class="drum-pad" onclick="playSound(69, this)">PAD 06<span class="pad-key">Rimshot</span></div>
+            <div class="drum-pad" onclick="playSound(71, this)">PAD 07<span class="pad-key">Closed Hat</span></div>
+            <div class="drum-pad" onclick="playSound(72, this)">PAD 08<span class="pad-key">Open Hat</span></div>
+            
+            <div class="drum-pad" onclick="playSound(74, this)">PAD 09<span class="pad-key">Cymbal</span></div>
+            <div class="drum-pad" onclick="playSound(76, this)">PAD 10<span class="pad-key">Ride</span></div>
+            <div class="drum-pad" onclick="playSound(77, this)">PAD 11<span class="pad-key">Tom 1</span></div>
+            <div class="drum-pad" onclick="playSound(79, this)">PAD 12<span class="pad-key">Tom 2</span></div>
+            
+            <div class="drum-pad" onclick="playSound(81, this)">PAD 13<span class="pad-key">Sub Bass</span></div>
+            <div class="drum-pad" onclick="playSound(83, this)">PAD 14<span class="pad-key">808 Drop</span></div>
+            <div class="drum-pad" onclick="playSound(84, this)">PAD 15<span class="pad-key">Synth Stab</span></div>
+            <div class="drum-pad" onclick="playSound(86, this)">PAD 16<span class="pad-key">Vocal Hit</span></div>
+        </main>
+
+        <footer class="system-footer">
+            [STATUS: CREATIVE STUDIO AGGREGATOR ACTIVE // NO ROADBLOCKS SECURED]
+        </footer>
+    </div>
+
+    <script>
+        // Initialize browser-native Web Audio API engine cleanly out-of-the-box
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(note, element) {
+            // Wake up audio context memory if it was resting
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            // Visual flex indicator flash triggers instantly
+            element.classList.add('playing');
+            setTimeout(() => element.classList.remove('playing'), 100);
+
+            // Compute math frequencies out-of-the-box
+            const frequency = 440 * Math.pow(2, (note - 69) / 12);
+
+            // Generate localized oscillator synthesizers to bypass sample load lag completely
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.type = note < 66 ? 'triangle' : 'sine'; // Deep tones for kicks, crisp sharp waves for hats
+            osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+
+            // Envelope parameters: fast transient punch fading out smoothly
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+    </script>
+</body>
+</html>
