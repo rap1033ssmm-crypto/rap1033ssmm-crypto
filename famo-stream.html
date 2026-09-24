@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Famo-Stream // Serverless Broadcast Matrix</title>
+    <!-- Basic structural styling and layout configuration -->
+</head>
+    <style>
+        :root {
+            --bg-dark: #0a0b0d;
+            --surface-panel: #12141a;
+            --border-line: #1e222b;
+            --gold-accent: #d4af37;
+            --text-bright: #ffffff;
+            --text-dim: #717b99;
+        }
+        /* [Core CSS styles for layout, dark-mode variables, studio grid, player frame, and playlist deck are provided in the full code block] */
+    </style>
+</head>
+<body>
+    <div class="player-console-container">
+        <!-- Live System Header Bar Layout Block -->
+        <header class="marquee-header">
+            <div class="brand-block">
+                <h1>Famo-Stream</h1>
+                <p>REGISTRY LEDGER: ISSN 3143-9756 // SERVERLESS BROADCAST MATRIX</p>
+            </div>
+            <div class="search-container">
+                <input type="text" id="streamSearch" placeholder="Filter decentralized catalog nodes..." oninput="filterMediaTracks()">
+            </div>
+        </header>
+
+        <!-- Main Studio Theater Grid Area Layer -->
+        <main class="studio-grid">
+            <!-- Left Stage Principal Cinema Viewport Block -->
+            <section class="cinema-viewport">
+                <div class="player-frame">
+                    <video id="famoCorePlayer" playsinline controls>
+                        <source src="https://googleapis.com" type="video/mp4" id="playerSourceNode" />
+                    </video>
+                </div>
+                <div class="meta-description-card">
+                    <h2 id="viewTitle">Famo-Stream Node Standby</h2>
+                    <div class="telemetry-row">
+                        <span id="viewRegistry">SYSTEM LOG: STANDBY</span>
+                        <span>•</span>
+                        <span id="viewDuration">Duration: Live Broadcast</span>
+                    </div>
+                    <p id="viewDesc">Initializing decentralized intake transmission lines... Select a data track file item from the sidebar registry container deck to start playback immediately.</p>
+                </div>
+            </section>
+
+            <!-- Right Sidebar Media Registry Playlist Navigation Deck -->
+            <aside class="playlist-deck">
+                <h3>Decentralized Media Registry</h3>
+                <div id="mediaTrackListDeck"></div>
+            </aside>
+        </main>
+
+        <footer class="system-footer">
+            FAMO NATION ORGANIZATION OMNISPHERE // PLATFORM AUTOPILOT GATEWAY // 2026
+        </footer>
+    </div>
+
+    <script>
+        // Centralized Serverless Media Registry Matrix Data Array
+        // REPLACE THESE EXAMPLE VIDEO URLS DIRECTLY WITH YOUR CLOUDFLARE R2 OR S3 LINK STRINGS!
+        let mediaRegistryMatrix = [
+            {
+                id: 1,
+                title: "Famo Nation Organization Show Opener - Segment 01",
+                duration: "00:45",
+                registryCode: "REG-FN-101",
+                desc: "The primary tournament arena introductory sequence showcasing original corporate branding layouts and validation markers under ledger asset tracking ISSN 3143-9756.",
+                videoUrl: "https://googleapis.com"
+            },
+            {
+                id: 2,
+                title: "Lyrics And Flow The Show: Battle Of The Lyrics Promotional Loop",
+                duration: "01:02",
+                registryCode: "REG-LF-202",
+                desc: "High-octane teaser trailer displaying bracket slots, automated critique dashboards, and live voting circle frameworks designed for the 2026 staging networks.",
+                videoUrl: "https://googleapis.com"
+            },
+            {
+                id: 3,
+                title: "OmniSphere AI Core Terminal System Maintenance Run",
+                duration: "02:15",
+                registryCode: "REG-OMNI-303",
+                desc: "Technical video overview exploring serverless cloud edge distribution layers, cryptographic hash verification pulses, and direct client transmission protocols.",
+                videoUrl: "https://googleapis.com"
+            }
+        ];
+
+        const listContainer = document.getElementById('mediaTrackListDeck');
+
+        function renderMediaTrackList(filteredTracks = mediaRegistryMatrix) {
+            listContainer.innerHTML = '';
+            filteredTracks.forEach((track) => {
+                const currentVideoSrc = document.getElementById('famoCorePlayer').src;
+                const isCurrent = track.videoUrl === currentVideoSrc;
+                
+                const card = document.createElement('div');
+                card.className = `video-item-card ${isCurrent ? 'active-playing' : ''}`;
+                card.onclick = () => loadTargetVideoNode(track.id);
+
+                card.innerHTML = `
+                    <div class="thumbnail-mock">▶</div>
+                    <div class="card-details">
+                        <h4>${track.title}</h4>
+                        <span>${track.registryCode} • ${track.duration}</span>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function loadTargetVideoNode(trackId) {
+            const matchedTrack = mediaRegistryMatrix.find(t => t.id === trackId);
+            if (!matchedTrack) return;
+
+            const videoElement = document.getElementById('famoCorePlayer');
+            videoElement.src = matchedTrack.videoUrl;
+
+            document.getElementById('viewTitle').innerText = matchedTrack.title;
+            document.getElementById('viewRegistry').innerText = `SYSTEM LOG: ${matchedTrack.registryCode}`;
+            document.getElementById('viewDuration').innerText = `Duration: ${matchedTrack.duration}`;
+            document.getElementById('viewDesc').innerText = matchedTrack.desc;
+
+            videoElement.load();
+            videoElement.play();
+            renderMediaTrackList();
+        }
+
+        function filterMediaTracks() {
+            const query = document.getElementById('streamSearch').value.toLowerCase().trim();
+            const results = mediaRegistryMatrix.filter(track => 
+                track.title.toLowerCase().includes(query) || 
+                track.desc.toLowerCase().includes(query) || 
+                track.registryCode.toLowerCase().includes(query)
+            );
+            renderMediaTrackList(results);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (mediaRegistryMatrix.length > 0) {
+                const initialTrack = mediaRegistryMatrix[0];
+                document.getElementById('viewTitle').innerText = initialTrack.title;
+                document.getElementById('viewRegistry').innerText = `SYSTEM LOG: ${initialTrack.registryCode}`;
+                document.getElementById('viewDuration').innerText = `Duration: ${initialTrack.duration}`;
+                document.getElementById('viewDesc').innerText = initialTrack.desc;
+                renderMediaTrackList();
+            }
+        });
+    </script>
+</body>
+</html>
