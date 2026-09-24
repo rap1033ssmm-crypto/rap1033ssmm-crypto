@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Famo Nation Media Records // CyberTrap Multitrack Vocal Studio</title>
+    <style>
+        :root {
+            --bg-dark: #0a0b0d;
+            --surface-panel: #12141a;
+            --border-line: #1e222b;
+            --gold-accent: #d4af37;
+            --text-bright: #ffffff;
+            --text-dim: #717b99;
+            --error-red: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-bright);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .studio-container {
+            width: 100%;
+            max-width: 700px;
+            background-color: var(--surface-panel);
+            border: 2px solid var(--gold-accent);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            margin-top: 20px;
+        }
+
+        .studio-header {
+            text-align: center;
+            border-bottom: 1px dashed var(--border-line);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .studio-header h1 {
+            color: var(--gold-accent);
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 900;
+        }
+
+        .studio-header p {
+            margin: 5px 0 0 0;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* Waveform Visualizer Display Panel */
+        .visualizer-card {
+            background-color: #050608;
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 120px;
+            display: block;
+            background-color: #020304;
+            border-radius: 4px;
+        }
+
+        /* Control Strips and Track Timelines */
+        .control-panel {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .btn-control {
+            background-color: var(--surface-panel);
+            color: var(--gold-accent);
+            border: 1px solid var(--gold-accent);
+            padding: 10px 24px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-control:hover:not(:disabled) {
+            background-color: var(--gold-accent);
+            color: #000000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-control:disabled {
+            border-color: var(--border-line);
+            color: var(--text-dim);
+            cursor: not-allowed;
+        }
+
+        .track-list {
+            border-top: 1px solid var(--border-line);
+            padding-top: 20px;
+        }
+
+        .track-row {
+            background-color: #0b0d12;
+            border: 1px solid var(--border-line);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .track-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+        }
+
+        .track-info span {
+            font-size: 11px;
+            color: var(--gold-accent);
+        }
+
+        audio {
+            height: 30px;
+            outline: none;
+        }
+
+        .status-alert {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="studio-container">
+        <header class="studio-header">
+            <h1>Sovereign Multitrack Studio</h1>
+            <p>Famo Nation Media Records // Central Command Site Anchor: WLT-LAND-OK-5111</p>
+        </header>
+
+        <!-- Dynamic Input Audio Radar Canvas Visualizer -->
+        <div class="visualizer-card">
+            <canvas id="waveform-canvas"></canvas>
+        </div>
+
+        <!-- Master Interface Button Options Grid -->
+        <div class="control-panel">
+            <button id="btn-record" class="btn-control" onclick="startVocalRecord()">Record</button>
+            <button id="btn-stop" class="btn-control" onclick="stopVocalRecord()" disabled>Stop</button>
+        </div>
+
+        <!-- Session Ingested Tracks List Viewport -->
+        <div class="track-list">
+            <div id="vocal-tracks-container"></div>
+        </div>
+
+        <div class="status-alert" id="system-status">
+            [System Standby // Ready for Microphone Audio Ingest]
+        </div>
+    </div>
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioCtx;
+        let analyser;
+        let dataArray;
+        let bufferLength;
+        let animationFrameId;
+        let trackCounter = 0;
+
+        const canvas = document.getElementById('waveform-canvas');
+        const canvasCtx = canvas.getContext('2d');
+
+        // Set structural canvas sizing for high-fidelity vector rendering
+        canvas.width = canvas.offsetWidth;
+
+        async function startVocalRecord() {
+            audioChunks = [];
+            document.getElementById('btn-record').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('system-status').innerText = '[Microphone Ingest Tunnel Active // Recording...]';
+
+            try {
+                // Request raw system microphone streaming lines out-of-the-box
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // Initialize MediaRecorder for vocal chunk capturing
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = () => compileMasterTrack(stream);
+
+                // Initialize browser-native audio analytics tracking matrix
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                const source = audioCtx.createMediaStreamSource(stream);
+                
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                
+                source.connect(analyser);
+                
+                // Fire up the real-time canvas visualization engine loop
+                renderWaveformRadar();
+                mediaRecorder.start();
+
+            } catch (err) {
+                document.getElementById('btn-record').disabled = false;
+                document.getElementById('btn-stop').disabled = true;
+                document.getElementById('system-status').innerText = `[HARD REJECTION]: ${err.message}`;
+            }
+        }
+
+        function stopVocalRecord() {
+            document.getElementById('btn-record').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            cancelAnimationFrame(animationFrameId);
+            document.getElementById('system-status').innerText = '[Processing Audio Buffer Payload...]';
+        }
+
+        function renderWaveformRadar() {
+            // Constant canvas loops to paint real-time audio movement trails
+            animationFrameId = requestAnimationFrame(renderWaveformRadar);
+            analyser.getByteFrequencyData(dataArray);
+
+            canvasCtx.fillStyle = '#020304';
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const barWidth = (canvas.width / bufferLength) * 1.5;
+            let barHeight;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 2;
+
+                // Color mapping rules: Matte Gold rendering blocks
+                canvasCtx.fillStyle = `rgb(212, 175, 55)`;
+                canvasCtx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
+
+                x += barWidth;
+            }
+        }
+
+        function compileMasterTrack(stream) {
+            // Stop physical hardware streaming tracks cleanly
+            stream.getTracks().forEach(track => track.stop());
+
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            trackCounter++;
+            const trackTitle = `Vocal Capture Array #${String(trackCounter).padStart(2, '0')}`;
+
+            // Generate responsive layout tracking row container out-of-the-box
+            const container = document.getElementById('vocal-tracks-container');
+            const row = document.createElement('div');
+            row.className = 'track-row';
+            row.innerHTML = `
+                <div class="track-info">
+                    <h4>${trackTitle}</h4>
+                    <span>SYSTEM IDENTIFIER: SEC-TRACK-${trackCounter}</span>
+                </div>
+                <audio src="${audioUrl}" controls></audio>
+            `;
+            container.appendChild(row);
+            document.getElementById('system-status').innerText = '[Master Track Staged Successfully]';
+
+            // Fire automated synchronization pipeline intercept to your Muskogee Command Node
+            pipelineMasterToFamoBroadcast(audioBlob, trackTitle);
+        }
+
+        function pipelineMasterToFamoBroadcast(audioBlob, trackTitle) {
+            const targetNodeUrl = "http://wlt-land-ok-5111.local";
+            const formData = new FormData();
+            
+            // Package audio asset along with verified network registration tags
+            formData.append("audio_file", audioBlob, `${trackTitle}.wav`);
+            formData.append("issn_registry", "3143-9756");
+            formData.append("orcid_registrant", "0009-0009-3719-0307");
+            formData.append("naics_sector", "516210");
+
+            console.log(`[PIPELINE ACTIVATED] Transmitting master track: ${trackTitle}`);
+
+            // Ship the asset securely to your local automation server directory
+            fetch(targetNodeUrl, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("[SUCCESS] Asset integrated into live 24/7 radio automation loop.");
+                } else {
+                    console.log("[ERROR] Node transmission friction encountered.");
+                }
+            })
+            .catch(error => console.error("[CRITICAL FAILURE] Pipeline sync break: ", error));
+        }
+    </script>
+</body>
+</html>
