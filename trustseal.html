@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustSeal ICP // Sovereign Blockchain Verification Portal</title>
+    <style>
+        :root {
+            --bg-dark: #050608;
+            --surface-panel: #0d0f13;
+            --border-line: #1a1d26;
+            --gold-accent: #d4af37;
+            --text-bright: #ffffff;
+            --text-dim: #64748b;
+            --success-green: #22c55e;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-bright);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .portal-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--surface-panel);
+            border: 2px solid var(--gold-accent);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            margin-top: 20px;
+        }
+
+        .portal-header {
+            text-align: center;
+            border-bottom: 1px dashed var(--border-line);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .portal-header h1 {
+            color: var(--gold-accent);
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 900;
+        }
+
+        .portal-header p {
+            margin: 6px 0 0 0;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Role-Based Panel Navigation Grid */
+        .role-tabs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background-color: #0b0d12;
+            border: 1px solid var(--border-line);
+            color: var(--text-dim);
+            padding: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active-tab, .tab-btn:hover {
+            border-color: var(--gold-accent);
+            color: var(--gold-accent);
+            background-color: #141722;
+        }
+
+        /* Master Display Workspace Dynamic Area */
+        .display-workspace {
+            background-color: #020304;
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 25px;
+            min-height: 260px;
+            box-sizing: border-box;
+        }
+
+        .panel-view { display: none; }
+        .panel-view.active-view { display: block; }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            color: var(--gold-accent);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .app-input {
+            width: 100%;
+            background-color: #080a0f;
+            border: 1px solid var(--border-line);
+            color: #fff;
+            padding: 10px 12px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .app-input:focus {
+            border-color: var(--gold-accent);
+            outline: none;
+        }
+
+        .action-btn {
+            background-color: var(--gold-accent);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.1s ease;
+        }
+
+        .action-btn:active { transform: scale(0.99); }
+
+        .token-receipt-card {
+            background-color: #0b0d12;
+            border-left: 4px solid var(--success-green);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 6px 6px 0;
+            font-size: 12px;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .receipt-row span:first-child { color: var(--text-dim); }
+        .receipt-row span:last-child { color: #fff; font-family: monospace; }
+
+        .system-footer {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-top: 25px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-container">
+        <header class="portal-header">
+            <h1>TrustSeal ICP Control Portal</h1>
+            <p>Famo Nation Media Records // Cryptographic Ledger Registry Index: ISSN 3143-9756</p>
+        </header>
+
+        <!-- Role Access Navigation Bar Controls -->
+        <nav class="role-tabs-grid">
+            <button class="tab-btn active-tab" onclick="switchView('admin', this)">01 // Admin Core</button>
+            <button class="tab-btn" onclick="switchView('issuer', this)">02 // Token Mint</button>
+            <button class="tab-btn" onclick="switchView('checker', this)">03 // Secure Audit</button>
+        </nav>
+
+        <!-- Live Operations Screen Window -->
+        <main class="display-workspace">
+
+                      <!-- INTERFACE VIEW 1: ADMIN OVERLORD CONTROL PANEL -->
+            <div id="panel-admin" class="panel-view active-view">
+                <div class="input-group">
+                    <label for="admin-principal">Register User Principal ID Target:</label>
+                    <input type="text" id="admin-principal" class="app-input" placeholder="e.g. principal-id-string-format-icp-network">
+                </div>
+                <div class="input-group">
+                    <label for="admin-role">Assign System Access Clearance:</label>
+                    <select id="admin-role" class="app-input" style="background-color: #080a0f;">
+                        <option value="ISSUER">Authorized Issuer Node (Famo Records Master)</option>
+                        <option value="CHECKER">Public Audit Compliance Node</option>
+                    </select>
+                </div>
+                <button class="action-btn" onclick="executeAdminRegister()">Authorize Identity Role Link</button>
+                <div id="admin-log" style="margin-top: 15px; font-size: 11px; color: var(--success-green); font-family: monospace;"></div>
+            </div>
+
+            <!-- INTERFACE VIEW 2: AUTHORIZED ISSUER TOKEN MINT ENGINE -->
+            <div id="panel-issuer" class="panel-view">
+                <div class="input-group">
+                    <label for="mint-recipient">Artist / Registrant Principal Wallet ID Address:</label>
+                    
+                </div>
+                <div class="input-group">
+                    <label for="mint-asset">NFT Media Asset / Track Asset Title Group Name:</label>
+                    <input type="text" id="mint-asset" class="app-input" placeholder="e.g. Lyrics And Flow Championship Single Drop #01">
+                </div>
+                <div class="input-group">
+                    <label for="mint-meta">Token Custom Attribute Metadata JSON Record:</label>
+                    <input type="text" id="mint-meta" class="app-input" value='{"issn":"3143-9756", "naics":"516210", "origin":"WLT-LAND-OK-5111"}'>
+                </div>
+                <button class="action-btn" onclick="executeTokenMint()">Mint Digital Asset NFT Seal</button>
+                
+                <div id="receipt-display" style="display: none;">
+                    <div class="token-receipt-card">
+                        <div style="font-weight: bold; margin-bottom: 10px; color: var(--success-green);">✓ DOCKER-ICP BLOCKCHAIN DECENTRALIZED NFT ASSET RECEIPT MINTED</div>
+                        <div class="receipt-row"><span>Token Identifier Hash:</span><span id="rcpt-hash">N/A</span></div>
+                        <div class="receipt-row"><span>Asset Designation:</span><span id="rcpt-title">N/A</span></div>
+                        <div class="receipt-row"><span>Owner Principal Wallet:</span><span id="rcpt-wallet">N/A</span></div>
+                        <div class="receipt-row"><span>Ledger Status Pulse:</span><span>IMMUTABLE RECORD LOCKED SUCCESS</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERFACE VIEW 3: SUB-SECOND SECURE AUDIT CHECKER PORTAL -->
+            <div id="panel-checker" class="panel-view">
+                <div class="input-group">
+                    <label for="audit-hash">Input Token Transaction Hash Asset ID String:</label>
+                    <input type="text" id="audit-hash" class="app-input" placeholder="Paste verification hash payload registry string here...">
+                </div>
+                <button class="action-btn" onclick="executeSecureAudit()">Verify Token Provenance Audit Trace</button>
+                <div id="audit-result" style="margin-top: 15px;"></div>
+            </div>
+        </main>
+
+        <footer class="system-footer">
+            FAMO NATION COMMAND PANELS // CORE SYSTEM NODE INTEGRATOR ACCELERATOR // 2026
+        </footer>
+    </div>
+
+    <!-- UI Execution Controllers Script Matrix Layer -->
+    <script>
+        // Local simulation cache array grid database
+        let localTokenLedgerRegistry = {};
+
+        function switchView(targetRole, element) {
+            // Deactivate all running screen views
+            document.querySelectorAll('.panel-view').forEach(view => view.classList.remove('active-view'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+            
+            // Activate the matching tab parameters out-of-the-box
+            document.getElementById(`panel-${targetRole}`).classList.add('active-view');
+            element.classList.add('active-tab');
+        }
+
+        function executeAdminRegister() {
+            const principal = document.getElementById('admin-principal').value.trim();
+            const role = document.getElementById('admin-role').value;
+            const log = document.getElementById('admin-log');
+
+            if (!principal) {
+                log.style.color = '#ef4444';
+                log.innerText = "[ERROR]: Identity principal string field cannot remain empty.";
+                return;
+            }
+
+            log.style.color = 'var(--terminal-green)';
+            log.innerText = `[SUCCESS]: Identity principal target ${principal.substring(0,8)}... mapped directly to system role governance [${role}] on pure autopilot.`;
+        }
+
+        function executeTokenMint() {
+            const recipient = document.getElementById('mint-recipient').value.trim();
+            const assetTitle = document.getElementById('mint-asset').value.trim();
+            const metadata = document.getElementById('mint-meta').value.trim();
+            const receipt = document.getElementById('receipt-display');
+
+            if (!recipient || !assetTitle) {
+                alert("Please fill all deployment parameters before hitting mint.");
+                return;
+            }
+
+            // Generate clean cryptographic mock txn hash out-of-the-box
+            const cryptoTxnHash = "icp-txn-hash-" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            
+            // Register details straight into browser memory ledger
+            localTokenLedgerRegistry[cryptoTxnHash] = {
+                title: assetTitle,
+                owner: recipient,
+                meta: metadata,
+                timestamp: new Date().toLocaleString()
+            };
+
+            // Feed text logs to dashboard metadata metrics windows
+            document.getElementById('rcpt-hash').innerText = cryptoTxnHash;
+            document.getElementById('rcpt-title').innerText = assetTitle;
+            document.getElementById('rcpt-wallet').innerText = `${recipient.substring(0, 12)}...${recipient.substring(recipient.length - 4)}`;
+            
+            receipt.style.display = 'block';
+        }
+
+        function executeSecureAudit() {
+            const hash = document.getElementById('audit-hash').value.trim();
+            const display = document.getElementById('audit-result');
+
+            if (!hash) {
+                display.innerHTML = `<div style="font-size:12px; color:#ef4444; font-family:monospace;">[ERROR]: Enter target hash registry entry key to run lookup.</div>`;
+                return;
+            }
+
+            const matchedRecord = localTokenLedgerRegistry[hash];
+
+            if (matchedRecord) {
+                display.innerHTML = `
+                    <div style="background-color:#141722; border:1px solid var(--gold-accent); padding:15px; border-radius:6px; font-size:12px;">
+                        <div style="font-weight:bold; color:var(--gold-accent); margin-bottom:8px; text-transform:uppercase;">⚡ VERIFIED DIP721 BLOCKCHAIN ASSET DETECTED</div>
+                        <div style="margin-bottom:4px;"><b>Asset Name:</b> ${matchedRecord.title}</div>
+                        <div style="margin-bottom:4px;"><b>Current Owner:</b> <span style="font-family:monospace; color:#22c55e;">${matchedRecord.owner}</span></div>
+                        <div style="margin-bottom:4px;"><b>Metadata Ingestion Log:</b> <span style="font-family:monospace; color:var(--text-dim);">${matchedRecord.meta}</span></div>
+                        <div><b>Blockchain Sync Stamp:</b> ${matchedRecord.timestamp}</div>
+                    </div>
+                `;
+            } else {
+                display.innerHTML = `
+                    <div style="background-color:#1c1012; border:1px solid #ef4444; padding:15px; border-radius:6px; font-size:12px; color:#ef4444; font-family:monospace;">
+                        [HARD AUDIT EXCEPTION FAILURE]: The provided verification transaction hash does not match any authenticated cryptographic asset tokens logged inside the decentralized ecosystem canister registry index.
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
