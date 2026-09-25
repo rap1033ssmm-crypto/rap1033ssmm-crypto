@@ -575,24 +575,46 @@ margin-top: 50px;letter-spacing: 3px;font-weight: 600;}
             }
         }
 
-        function executeVerification() {
+            async function executeVerification() {
             const assetInput = document.getElementById('asset-id').value;
             const outputDiv = document.getElementById('verification-output');
             const successBox = document.getElementById('success-box');
             const auditBox = document.getElementById('audit-box');
 
             if (!assetInput.trim()) {
-                // If empty, show audit warning block as a fallback example
                 outputDiv.style.display = 'block';
                 successBox.style.display = 'none';
                 auditBox.style.display = 'block';
-            } else {
-                // If text is entered, show green success deployment path
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/verify-asset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ assetId: assetInput })
+                });
+                
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    outputDiv.style.display = 'block';
+                    successBox.style.display = 'block';
+                    auditBox.style.display = 'none';
+                    document.querySelector('#success-box div:nth-child(2)').innerHTML = 
+                        `Asset catalog securely locked into the Famo Nation Matrix Engine. Reference Hash: <strong>${data.hash}</strong>. Status: ${data.message}`;
+                } else {
+                    throw new Error(data.message || 'Verification Mismatch');
+                }
+            } catch (error) {
                 outputDiv.style.display = 'block';
-                successBox.style.display = 'block';
-                auditBox.style.display = 'none';
+                successBox.style.display = 'none';
+                auditBox.style.display = 'block';
+                document.querySelector('#audit-box div:nth-child(2)').innerText = 
+                    `Audit Exception: ${error.message}. Routing asset stream through fallback proxy lanes.`;
             }
         }
+
     </script>
 </body>
 </html>
