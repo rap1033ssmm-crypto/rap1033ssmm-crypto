@@ -544,10 +544,33 @@ margin-top: 50px;letter-spacing: 3px;font-weight: 600;}
                 </div>
             </div>
 
-            <!-- Placeholder Panes for Demo Navigation Continuity -->
+                   <!-- Audit Station Pane -->
             <div id="audit-pane" class="view-section-pane">
-                <p style="color: var(--text-muted); font-size: 13px;">OmniSphere Audit Node systems fully operational. Standing by for ledger instructions...</p>
+                <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <label style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Live Cryptographic Network Telemetry</label>
+                    <button type="button" onclick="fetchLiveLogs()" style="background: transparent; border: 1px solid rgba(212,175,55,0.4); color: var(--gold-prime); padding: 6px 12px; font-size: 10px; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Refresh Logs</button>
+                </div>
+                <div style="overflow-x: auto; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <table style="width: 100%; border-collapse: collapse; font-family: monospace; font-size: 12px; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(212,175,55,0.2); color: var(--text-muted); text-transform: uppercase; font-size: 10px; letter-spacing: 1px;">
+                                <th style="padding: 12px 16px;">Timestamp</th>
+                                <th style="padding: 12px 16px;">Node ID</th>
+                                <th style="padding: 12px 16px;">Asset Target</th>
+                                <th style="padding: 12px 16px;">Check Class</th>
+                                <th style="padding: 12px 16px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-grid-body">
+                            <tr>
+                                <td colspan="5" style="padding: 24px; text-align: center; color: var(--text-muted);">No records indexed. Execute an audit check to broadcast data logs.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+
             <div id="network-pane" class="view-section-pane">
                 <p style="color: var(--text-muted); font-size: 13px;">Broadcast Matrix Engine synchronization layer verified. Channels active.</p>
             </div>
@@ -614,6 +637,41 @@ margin-top: 50px;letter-spacing: 3px;font-weight: 600;}
                     `Audit Exception: ${error.message}. Routing asset stream through fallback proxy lanes.`;
             }
         }
+
+            async function fetchLiveLogs() {
+            const gridBody = document.getElementById('log-grid-body');
+            try {
+                const response = await fetch('/api/logs');
+                if (!response.ok) throw new Error('Data collection mismatch.');
+                const logs = await response.json();
+                
+                if (logs.length === 0) {
+                    gridBody.innerHTML = `<tr><td colspan="5" style="padding: 24px; text-align: center; color: var(--text-muted);">Ledger data empty. Waiting for matrix transactions...</td></tr>`;
+                    return;
+                }
+
+                gridBody.innerHTML = logs.map(log => `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); color: rgba(255,255,255,0.85);">
+                        <td style="padding: 12px 16px; color: var(--gold-prime);">${new Date(log.timestamp).toLocaleTimeString()}</td>
+                        <td style="padding: 12px 16px;">${log.node_identifier || log.node_id || 'OMNISPHERE-NODE'}</td>
+                        <td style="padding: 12px 16px; color: var(--text-muted);">${(log.asset_key || '').substring(0, 12)}...</td>
+                        <td style="padding: 12px 16px;">${log.integrity_check_type || 'SHA-256 Validated'}</td>
+                        <td style="padding: 12px 16px;"><span style="color: ${log.verification_status === 'SECURE' ? 'var(--neon-green)' : 'var(--neon-red)'}; font-weight: bold;">● ${log.verification_status || 'SECURE'}</span></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                gridBody.innerHTML = `<tr><td colspan="5" style="padding: 24px; text-align: center; color: var(--neon-red);">Telemetry Link Error: ${error.message}</td></tr>`;
+            }
+        }
+
+        // Auto-fetch database logs whenever the operator toggles into the Audit view room
+        const originalSwitchTab = switchTab;
+        switchTab = function(tabName) {
+            originalSwitchTab(tabName);
+            if (tabName === 'audit') {
+                fetchLiveLogs();
+            }
+        };
 
     </script>
 </body>
