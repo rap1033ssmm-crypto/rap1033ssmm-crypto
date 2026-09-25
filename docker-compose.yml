@@ -91,3 +91,39 @@ volumes:
   seaweed_volume_vault:
   freeswitch_config_vault:
   freeswitch_log_vault:
+    famo_ledger_data:
+
+  # =========================================================================
+  # SYSTEM X: REAL-TIME LEDGER BACKEND & CRYPTOGRAPHIC VALIDATION ENGINE
+  # =========================================================================
+  famo-matrix-backend:
+    image: node:18-alpine
+    container_name: famo_matrix_backend
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    ports:
+      - "5000:5000"
+    networks:
+      - famo_overlord_mesh
+
+  # SYSTEM Y: PERSISTENT CRYPTOGRAPHIC LOGS STORAGE LAYER
+  famo-ledger-db:
+    image: postgres:15-alpine
+    container_name: famo_ledger_database
+    restart: always
+    environment:
+      - POSTGRES_USER=famo_admin
+      - POSTGRES_PASSWORD=famo_matrix_secure_token_2026
+      - POSTGRES_DB=famo_sovereign_ledger
+    volumes:
+      - famo_ledger_data:/var/lib/postgresql/data
+    networks:
+      - famo_overlord_mesh
+
+
