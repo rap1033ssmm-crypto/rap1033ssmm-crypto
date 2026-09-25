@@ -1,0 +1,12 @@
+name = "famo-trustseal-gateway"
+main = "trustseal.html"
+compatibility_date = "2026-09-25"
+
+[site]
+bucket = "."
+include = ["trustseal.html", "index.html", "famo-stream.html"]
+
+# Route public API asset verification tracking checks directly to your server mesh
+[[routes]]
+pattern = "rap1033ssmm-crypto.github.io/api/*"
+zone_name = "github.io"
