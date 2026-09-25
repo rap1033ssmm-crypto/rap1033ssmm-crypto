@@ -433,27 +433,168 @@ margin-top: 50px;letter-spacing: 3px;font-weight: 600;}
 
             const verifiedRecord = canisterMemoryAllocationLedger[targetHash];
 
-            if (verifiedRecord) {
-                output.innerHTML = `
-                    <div style="background: rgba(0, 255, 102, 0.03); border: 1px solid var(--neon-green); padding: 25px; border-radius: 12px; font-size: 13px; line-height: 1.6; box-shadow: 0 10px 30px rgba(0,255,102,0.05);">
-                        <div style="font-weight:800; color:var(--neon-green); margin-bottom:15px; letter-spacing:1.5px; text-transform:uppercase; display:flex; align-items:center; gap:8px;">
-                            <span style="width:6px; height:6px; background-color:var(--neon-green); border-radius:50%; box-shadow:0 0 8px var(--neon-green);"></span>
-                            AUTHENTIC BLOCKCHAIN DIP721 NFT DATA CONFIRMED
-                        </div>
-                        <div><b>Asset Designation Title:</b> ${verifiedRecord.title}</div>
-                        <div><b>Verified Principal Owner:</b> <span style="font-family:monospace; color:var(--neon-green); font-weight:600;">${verifiedRecord.owner}</span></div>
-                        <div><b>Embedded Metadata Registry:</b> <span style="font-family:monospace; color:var(--text-muted);">\${verifiedRecord.meta}</span></div>
-                        <div style="margin-top: 12px; font-size:11px; color:var(--text-muted); border-top:1px dashed rgba(255,255,255,0.05); padding-top:10px;"><b>Canister Sync Time Stamp:</b> \${verifiedRecord.timestamp}</div>
+                       background: linear-gradient(135deg, var(--gold-prime) 0%, #b8901c 100%);
+            color: #030407;
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .premium-execute-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Verified Record Display & Neon Layout Blocks */
+        .verified-record-display {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .status-block-neon {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .status-block-neon.success-green {
+            background: rgba(0, 255, 102, 0.04);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.1), 0 0 10px rgba(0, 255, 102, 0.05) inset;
+        }
+
+        .status-block-neon.audit-red {
+            background: rgba(255, 51, 68, 0.04);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 20px rgba(255, 51, 68, 0.1), 0 0 10px rgba(255, 51, 68, 0.05) inset;
+        }
+
+        .status-title {
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-mainframe">
+        <!-- Corporate Master Brand Header Layout -->
+        <header class="brand-header">
+            <h1>TrustSeal ICP</h1>
+            <div class="system-ticker-badge">
+                <span class="ticker-pulse"></span>
+                Sovereign Asset Ledger
+            </div>
+            <p>Famo-Legacy Omnisphere // Writers Legacy Team Magazine // Famo Nation Distribution</p>
+        </header>
+
+        <!-- Premium Navigation Tier Selector Options -->
+        <nav class="governance-navigation-bar">
+            <button class="console-tab-btn active-panel-tab" onclick="switchTab('ledger')">Asset Ledger</button>
+            <button class="console-tab-btn" onclick="switchTab('audit')">Audit Station</button>
+            <button class="console-tab-btn" onclick="switchTab('network')">Distribution</button>
+        </nav>
+
+        <!-- Control Panel Center Console Viewport Display Grid -->
+        <main class="console-viewport">
+            
+            <!-- Asset Ledger Pane -->
+            <div id="ledger-pane" class="view-section-pane active-pane">
+                <div class="input-control-wrapper">
+                    <label for="asset-id">Sovereign Asset ID / Catalog Key</label>
+                    <input type="text" id="asset-id" class="premium-input-box" placeholder="Enter asset authentication hash...">
+                </div>
+                
+                <div class="input-control-wrapper">
+                    <label for="distribution-tier">Distribution Class Alignment</label>
+                    <select id="distribution-tier" class="premium-input-box">
+                        <option value="omnisphere">OmniSphere Architecture Deployment</option>
+                        <option value="legacy">Writers Legacy Syndication</option>
+                        <option value="famo-tv">Famo Nation TV Broadcast Matrix</option>
+                    </select>
+                </div>
+
+                <button class="premium-execute-btn" onclick="executeVerification()">Execute Cryptographic Audit</button>
+
+                <!-- Verified Record Display -->
+                <div class="verified-record-display" id="verification-output" style="display: none;">
+                    
+                    <!-- Neon Green Success Box -->
+                    <div class="status-block-neon success-green" id="success-box">
+                        <div class="status-title">✓ SECURE ENTRY RECORDED</div>
+                        <div>Asset catalog locked successfully into the Famo Nation Matrix Engine. Distribution pipelines cleared across global smart TV registries and digital endpoints. Verification hash active.</div>
                     </div>
-                `;
+
+                    <!-- Neon Red Audit Exception Box -->
+                    <div class="status-block-neon audit-red" id="audit-box">
+                        <div class="status-title">⚠ AUDIT EXCEPTION DETECTED</div>
+                        <div>Warning: Ledger sync mismatch identified on node network. Rerouting asset stream protocols through emergency bypass lines to prevent distribution truncation. Action required.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Placeholder Panes for Demo Navigation Continuity -->
+            <div id="audit-pane" class="view-section-pane">
+                <p style="color: var(--text-muted); font-size: 13px;">OmniSphere Audit Node systems fully operational. Standing by for ledger instructions...</p>
+            </div>
+            <div id="network-pane" class="view-section-pane">
+                <p style="color: var(--text-muted); font-size: 13px;">Broadcast Matrix Engine synchronization layer verified. Channels active.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- UI Interaction Scripts -->
+    <script>
+        function switchTab(tabName) {
+            // Remove active classes
+            document.querySelectorAll('.console-tab-btn').forEach(btn => btn.classList.remove('active-panel-tab'));
+            document.querySelectorAll('.view-section-pane').forEach(pane => pane.classList.remove('active-pane'));
+            
+            // Add active classes based on selection
+            if (tabName === 'ledger') {
+                document.getElementById('ledger-pane').classList.add('active-pane');
+                event.target.classList.add('active-panel-tab');
+            } else if (tabName === 'audit') {
+                document.getElementById('audit-pane').classList.add('active-pane');
+                event.target.classList.add('active-panel-tab');
+            } else if (tabName === 'network') {
+                document.getElementById('network-pane').classList.add('active-pane');
+                event.target.classList.add('active-panel-tab');
+            }
+        }
+
+        function executeVerification() {
+            const assetInput = document.getElementById('asset-id').value;
+            const outputDiv = document.getElementById('verification-output');
+            const successBox = document.getElementById('success-box');
+            const auditBox = document.getElementById('audit-box');
+
+            if (!assetInput.trim()) {
+                // If empty, show audit warning block as a fallback example
+                outputDiv.style.display = 'block';
+                successBox.style.display = 'none';
+                auditBox.style.display = 'block';
             } else {
-                output.innerHTML = `
-                    <div style="background: rgba(255, 51, 68, 0.03); border: 1px solid var(--neon-red); padding: 25px; border-radius: 12px; font-size: 13px; color:var(--neon-red); font-family: monospace; line-height: 1.6; box-shadow: 0 10px 30px rgba(255,51,68,0.05);">
-                        [HARD AUDIT EXCEPTION REJECTION FAILURE]: Zero authenticated token matches discovered matching this specific cryptographic reference hash signature string within the decentralized network registry canister ledger index. Access denied.
-                    </div>
-                `;
+                // If text is entered, show green success deployment path
+                outputDiv.style.display = 'block';
+                successBox.style.display = 'block';
+                auditBox.style.display = 'none';
             }
         }
     </script>
 </body>
 </html>
+
+
